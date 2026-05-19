@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Shuffle, TrendingDown } from "lucide-react";
 
+import { Footer } from "../../components/Footer";
 import { Nav } from "../../components/Nav";
 import { CounterfactualResult, LapSummary, postJSON } from "../../lib/api";
 
@@ -131,6 +132,8 @@ export default function CounterfactualPage() {
           </div>
         </div>
       </section>
+
+      <Footer />
     </main>
   );
 }

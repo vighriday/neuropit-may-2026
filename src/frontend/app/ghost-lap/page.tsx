@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { BarChart3, Gauge, Sparkles } from "lucide-react";
 
+import { Footer } from "../../components/Footer";
 import { Nav } from "../../components/Nav";
 import { GhostLapResult, LapSummary, postJSON } from "../../lib/api";
 
@@ -164,6 +165,8 @@ export default function GhostLapPage() {
           )}
         </div>
       </section>
+
+      <Footer />
     </main>
   );
 }

@@ -60,4 +60,12 @@ If you discover a vulnerability please follow `SECURITY.md`. Do not open a publi
 
 ## License
 
-NeuroPit is licensed under Apache 2.0. By contributing, you agree that your contributions will be licensed under the same license.
+NeuroPit is licensed under Apache 2.0. Copyright 2026 Hriday Vig. By contributing, you agree that your contributions will be licensed under the same license.
+
+## Maintainer
+
+[Hriday Vig](https://github.com/vighriday). NeuroPit was built solo for the IBM AI Builders Challenge 2026 powered by IBM SkillsBuild.
+
+---
+
+NeuroPit · Built by Hriday Vig · IBM AI Builders Challenge 2026 powered by IBM SkillsBuild.

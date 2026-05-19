@@ -15,7 +15,7 @@ NeuroPit is in active development. Security fixes are applied to the `main` bran
 
 Please do not file a public GitHub issue for a security report.
 
-Email vighriday@gmail.com with the following content.
+Email Hriday Vig at [vighriday@gmail.com](mailto:vighriday@gmail.com) with the following content.
 
 - A short title that identifies the affected component.
 - A reproducible description of the issue, including the exact commit, the configuration, and the steps that triggered the problem.
@@ -39,3 +39,7 @@ The following are out of scope unless the report identifies a NeuroPit specific 
 ## Defaults
 
 The `.env.example` file ships safe development defaults. Production deployments must rotate `API_JWT_SECRET` and `ENCRYPTION_KEY`. The biometric synthesiser encrypts heart rate, HRV, and respiration payloads at write through the Fernet helper.
+
+---
+
+NeuroPit · Built by Hriday Vig · IBM AI Builders Challenge 2026 powered by IBM SkillsBuild.

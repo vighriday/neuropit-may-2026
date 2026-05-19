@@ -75,3 +75,7 @@ The whole system should boot from one command. `docker compose up` brings the in
 ## Where the roadmap goes from here
 
 The roadmap deepens the Cognitive Twin rather than spreading the surface. Phase 4 already lives in this release through the Predictive Failure Engine, the Ghost Lap AI, and the Counterfactual Simulation Engine. Phase 5 already lives here through the Strategy Parliament and the Docling backed Qdrant ontology. Phase 6 already ships through the post race cognitive intelligence reports. Phase 7 already ships through the JWT cognitive gateway, the Fernet biometric encryption, and the audit log. The next phases swap the deterministic cognitive functions for learned behavioral models on the same feature inputs without changing the surface contract.
+
+---
+
+NeuroPit · Built by Hriday Vig · IBM AI Builders Challenge 2026 powered by IBM SkillsBuild.

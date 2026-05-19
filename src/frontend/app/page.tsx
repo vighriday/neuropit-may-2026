@@ -13,6 +13,7 @@ import {
 } from "recharts";
 import { Activity, AlertTriangle, Brain, Eye, Gauge, ShieldCheck, Sparkles, Target } from "lucide-react";
 
+import { Footer } from "../components/Footer";
 import { Nav } from "../components/Nav";
 
 type CognitiveSnapshot = {
@@ -295,6 +296,8 @@ export default function MissionControl() {
           )}
         </div>
       </div>
+
+      <Footer />
     </main>
   );
 }

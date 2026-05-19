@@ -150,3 +150,7 @@ Default retention is twelve hours which is enough for a full race weekend rehear
 2. Add an entry to this document with an example payload and the producer and consumer list.
 3. Update the affected pipeline modules.
 4. Note the change in `CHANGELOG.md` under the relevant version.
+
+---
+
+NeuroPit · Built by Hriday Vig · IBM AI Builders Challenge 2026 powered by IBM SkillsBuild.

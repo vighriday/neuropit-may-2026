@@ -8,10 +8,15 @@
 [![IBM Docling](https://img.shields.io/badge/IBM-Docling-052FAD)](https://www.docling.ai)
 [![Langflow](https://img.shields.io/badge/Langflow-Orchestrated-1f7a8c)](https://www.langflow.org)
 [![Tests](https://img.shields.io/badge/tests-104%20passing-success)](tests/)
+[![Built by Hriday Vig](https://img.shields.io/badge/Built%20by-Hriday%20Vig-1f6feb)](https://github.com/vighriday)
 
 > Real time Cognitive Twin Operating System for motorsport. Telemetry is infrastructure. Cognition is the product.
 
-NeuroPit is a probabilistic human state inference system for Formula racing. It does not optimise the car. It infers the driver. Built for the IBM AI Builders Challenge powered by IBM SkillsBuild.
+NeuroPit is a probabilistic human state inference system for Formula racing. It does not optimise the car. It infers the driver.
+
+**Built by [Hriday Vig](https://github.com/vighriday) for the IBM AI Builders Challenge 2026 powered by IBM SkillsBuild — Racing Innovation Challenge.**
+
+**IBM technologies used:** IBM Granite (open source community models via Hugging Face) · IBM Docling · Langflow.
 
 ---
 
@@ -201,8 +206,18 @@ The architecture is built so each phase swaps the inference function without rew
 
 ## Licence
 
-Apache 2.0. See [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE) for attributions.
+Apache 2.0. Copyright 2026 Hriday Vig. See [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE) for attributions.
+
+## Author
+
+**Hriday Vig** · [github.com/vighriday](https://github.com/vighriday) · `vighriday@gmail.com`
+
+NeuroPit was conceived, designed, and built solo by Hriday Vig for the **IBM AI Builders Challenge 2026 — Racing Innovation Challenge**, powered by IBM SkillsBuild.
 
 ## Acknowledgements
 
-NeuroPit was conceived, designed, and built for the IBM AI Builders Challenge powered by IBM SkillsBuild. The project relies on FastF1, OpenF1, IBM Granite, IBM Docling, Langflow, Redpanda, InfluxDB, Qdrant, FastAPI, and Next.js.
+The project relies on FastF1, OpenF1, IBM Granite, IBM Docling, Langflow, Redpanda, InfluxDB, Qdrant, FastAPI, and Next.js. Every third party component is attributed in [`NOTICE`](NOTICE).
+
+---
+
+NeuroPit · Built by Hriday Vig · IBM AI Builders Challenge 2026

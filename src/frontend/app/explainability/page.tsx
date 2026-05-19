@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { ScrollText, Sparkles } from "lucide-react";
 
+import { Footer } from "../../components/Footer";
 import { Nav } from "../../components/Nav";
 
 type CognitiveSnapshot = {
@@ -182,6 +183,8 @@ export default function ExplainabilityPage() {
           </article>
         ))}
       </section>
+
+      <Footer />
     </main>
   );
 }

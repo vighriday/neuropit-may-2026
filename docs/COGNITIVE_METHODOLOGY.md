@@ -123,3 +123,7 @@ The engine is also a stable foundation for the learned models that follow. The f
 ## 8. Versioning
 
 Every adjustment to the constants above lands in `CHANGELOG.md` against the version that ships them. The audit log writes the active constants alongside the cognitive event so historical replays remain reproducible.
+
+---
+
+NeuroPit · Built by Hriday Vig · IBM AI Builders Challenge 2026 powered by IBM SkillsBuild.

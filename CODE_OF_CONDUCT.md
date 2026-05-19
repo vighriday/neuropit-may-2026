@@ -34,10 +34,14 @@ This Code of Conduct applies within all community spaces, and also applies when 
 
 ## Enforcement
 
-Instances of abusive, harassing, or otherwise unacceptable behaviour may be reported to the project maintainer at vighriday@gmail.com. All complaints will be reviewed and investigated promptly and fairly.
+Instances of abusive, harassing, or otherwise unacceptable behaviour may be reported to the project maintainer Hriday Vig at [vighriday@gmail.com](mailto:vighriday@gmail.com). All complaints will be reviewed and investigated promptly and fairly.
 
 All maintainers are obligated to respect the privacy and security of the reporter of any incident.
 
 ## Attribution
 
-This Code of Conduct is adapted from the Contributor Covenant version 2.1, available at https://www.contributor-covenant.org/version/2/1/code_of_conduct.html.
+This Code of Conduct is adapted from the [Contributor Covenant version 2.1](https://www.contributor-covenant.org/version/2/1/code_of_conduct.html).
+
+---
+
+NeuroPit · Maintained by Hriday Vig · IBM AI Builders Challenge 2026 powered by IBM SkillsBuild.
