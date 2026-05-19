@@ -1,0 +1,72 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+venv/
+env/
+.venv/
+ENV/
+
+# FastF1 cache
+fastf1_cache/
+*.cache
+
+# Node
+node_modules/
+.next/
+out/
+dist/
+build/
+*.tsbuildinfo
+next-env.d.ts
+
+# Env files
+.env
+.env.local
+.env.*.local
+*.secret
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Logs
+*.log
+logs/
+audit_logs/*.jsonl
+!audit_logs/.gitkeep
+
+# Data
+data/raw/
+data/processed/
+*.parquet
+*.feather
+
+# Docling outputs
+docling_outputs/
+ontology_cache/
+
+# Model artifacts
+models/checkpoints/
+*.pt
+*.pth
+*.onnx
+*.bin
+
+# Docker
+.docker/
+
+# OS
+Thumbs.db
+desktop.ini
