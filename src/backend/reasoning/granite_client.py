@@ -36,6 +36,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import threading
 from typing import List, Optional
 
@@ -48,6 +49,29 @@ logger = logging.getLogger(__name__)
 
 _PIPELINE_LOCK = threading.Lock()
 _PIPELINE_CACHE: dict = {}
+
+
+_HF_ENV_KEYS = ("HF_HOME", "HF_HUB_CACHE", "HF_XET_CACHE", "HUGGINGFACE_HUB_CACHE")
+
+
+def _ensure_hf_env_propagated() -> None:
+    """Mirror HF_* values from .env into os.environ.
+
+    pydantic-settings reads the dotenv file but only exposes declared
+    fields. The Hugging Face transformers and huggingface_hub libraries
+    read these paths directly from os.environ. Without this bridge a
+    project that pins HF_HOME=D:\\huggingface in .env still ends up
+    writing cache files to the system drive.
+    """
+    try:
+        from dotenv import dotenv_values
+    except Exception:  # pragma: no cover - dotenv ships with pydantic-settings
+        return
+    values = dotenv_values(".env")
+    for key in _HF_ENV_KEYS:
+        value = values.get(key)
+        if value and not os.environ.get(key):
+            os.environ[key] = value
 
 
 def _load_local_pipeline(model_id: str):
@@ -63,6 +87,7 @@ def _load_local_pipeline(model_id: str):
         cached = _PIPELINE_CACHE.get(model_id)
         if cached is not None:
             return cached
+        _ensure_hf_env_propagated()
         from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
         import torch
 

@@ -13,7 +13,7 @@
 [![IBM Granite](https://img.shields.io/badge/IBM-Granite-052FAD?logo=ibm)](https://github.com/ibm-granite-community)
 [![IBM Docling](https://img.shields.io/badge/IBM-Docling-052FAD?logo=ibm)](https://www.docling.ai)
 [![Langflow](https://img.shields.io/badge/Langflow-Orchestrated-1f7a8c)](https://www.langflow.org)
-[![Tests](https://img.shields.io/badge/tests-104%20passing-brightgreen)](tests/)
+[![Tests](https://img.shields.io/badge/tests-131%20passing-brightgreen)](tests/)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-3776AB?logo=python&logoColor=white)](https://www.python.org)
 [![Next.js 14](https://img.shields.io/badge/Next.js-14-000000?logo=nextdotjs)](https://nextjs.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
@@ -255,7 +255,7 @@ If any step fails, the troubleshooting checklist lives under the FAQ at the bott
 | **IBM Docling usage** | [`src/backend/knowledge/docling_compiler.py`](src/backend/knowledge/docling_compiler.py) — compiles FIA reports, neuroscience papers, and racing literature into a Qdrant collection. Retrieved at every Granite call. |
 | **Langflow usage** | [`orchestration/langflow/neuropit_strategy_flow.json`](orchestration/langflow/neuropit_strategy_flow.json) — importable visual flow. |
 | **Innovation** | Three-tier system: diagnostic Cognitive Twin, prescriptive engine with typed action space and Optimality Gap against a per-driver Performance Envelope, audit-log-driven What-If Replay that lets the strategist re-run real session data under a mutated input. Nobody else ships this stack. |
-| **Technical depth** | Event-driven Redpanda pipeline, InfluxDB time-series persistence, Qdrant vector grounding, FastAPI WebSocket fan-out, JWT + RBAC, Fernet encryption at source, 104 unit tests, GitHub Actions CI. |
+| **Technical depth** | Event-driven Redpanda pipeline, InfluxDB time-series persistence, Qdrant vector grounding, FastAPI WebSocket fan-out, JWT + RBAC, Fernet encryption at source, 131 unit tests, GitHub Actions CI. |
 | **Explainability** | Every output ships with a Granite paragraph, a confidence band, and a JSONL audit row. Physics-first reasoning forbids Granite from inventing cognitive numbers. |
 | **Impact** | Closes the seven-figure gap between telemetry analytics and driver state. Generalises to aviation, defence, surgery, esports, and elite athletics. |
 | **Demo readiness** | One `make` command per terminal. Mission Control pit-wall shows the Cognitive Twin emitting within ten seconds of stream start. |
@@ -263,19 +263,16 @@ If any step fails, the troubleshooting checklist lives under the FAQ at the bott
 
 ---
 
-## Five-minute demo script
+## Demo path
 
-A run order judges or recruiters can follow without you in the room.
+The Judge Quickstart above takes you to a live Mission Control. Once the stream is running, the dashboard tells its own story in four panels:
 
-1. **00:00 — Open Mission Control.** Show the empty pit-wall with the driver selector strip.
-2. **00:30 — Start the stream.** Cognitive rings populate within ten seconds. Persona band switches from `Flow State` to a working state.
-3. **01:00 — Point at the rings.** Four primary metrics (Stress / Confidence / Fatigue / Panic Probability). Note the confidence dots next to each.
-4. **01:45 — Switch driver.** Demonstrate the per-driver scoped Granite reasoning panel changing instantly.
-5. **02:30 — Open the reasoning panel.** Confirm `via granite-local` label and the cited ontology passages.
-6. **03:00 — Point at the Prescriptive Engine panel.** Cognitive efficiency score, seconds left on the table this lap, primary prescribed action with its triggers, projected post-action efficiency, ranked alternatives with guardrail-blocked actions clearly labelled.
-7. **03:45 — Open the What-If drawer.** Pick a mutation preset ("Drop HR to calm baseline"), hit Run replay. Side-by-side baseline vs counterfactual trajectory plus a divergence summary, grounded in audit-log data rather than synthetic priors.
-8. **04:15 — Show the audit log.** Open any `audit_logs/cognitive-*.jsonl`. Point at `score_inputs`, `weights`, `model_source`. Note the audit row was written *before* the WebSocket emit, and that every prescription is audited the same way.
-9. **04:45 — Close on the differentiator.** Other systems ask what is happening to the car. NeuroPit infers the human nervous system operating the car, prescribes the next pit-wall action, and lets the strategist defend the call after the fact.
+1. **Cognitive Twin** populates in under ten seconds (rings + persona + trajectory chart).
+2. **Granite reasoning panel** renders one paragraph per driver, labelled `via granite-local`.
+3. **Prescriptive Engine panel** shows the cognitive efficiency score, the seconds left on the table this lap, and the prescribed pit-wall action with projected counterfactual twin.
+4. **What-If drawer** (top right button) mutates a real audit row and re-runs the cognitive maths, side by side.
+
+A minute-by-minute run order judges or recruiters can follow without you in the room lives in [`docs/DEMO.md`](docs/DEMO.md).
 
 ---
 
@@ -293,7 +290,7 @@ A run order judges or recruiters can follow without you in the room.
 | Knowledge | IBM Docling |
 | Orchestration | Langflow reference flow |
 | Telemetry source | OpenF1 + FastF1 |
-| Tests | pytest, 104 unit tests, integration tests gated on infra |
+| Tests | pytest, 131 unit tests, integration tests gated on infra |
 | CI | GitHub Actions on every push and pull request |
 
 ---
@@ -315,7 +312,7 @@ Vulnerability disclosure procedure lives in [`SECURITY.md`](SECURITY.md).
 ## Tests
 
 ```bash
-make test              # 104 unit tests, no infrastructure required
+make test              # 131 unit tests, no infrastructure required
 make integration       # integration smoke tests, requires Redpanda running
 ```
 
@@ -364,9 +361,10 @@ Every consumer gracefully degrades to "no grounding available" or "skipped" rath
 
 ## Documentation
 
-- [Architecture](docs/ARCHITECTURE.md) — five tiers, how a frame travels through the system.
-- [Cognitive methodology](docs/COGNITIVE_METHODOLOGY.md) — every weight, every threshold, the reasoning behind each one.
+- [Architecture](docs/ARCHITECTURE.md) — six tiers, how a frame travels through the system.
+- [Cognitive methodology](docs/COGNITIVE_METHODOLOGY.md) — every weight, every threshold, the reasoning behind each one, including the Driver Performance Envelope and the What-If replay contract.
 - [Event taxonomy](docs/EVENT_TAXONOMY.md) — every Kafka topic, its payload shape, producers, consumers.
+- [Demo script](docs/DEMO.md) — minute-by-minute walkthrough of the live pit wall.
 - [Changelog](CHANGELOG.md)
 - [Contributing](CONTRIBUTING.md)
 - [Security policy](SECURITY.md)
