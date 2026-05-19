@@ -5,7 +5,7 @@ Welcome. NeuroPit is a real time Cognitive Twin Operating System for motorsport.
 ## What we accept
 
 - Bug fixes against the existing cognitive engine, the emotional state engine, the predictive failure engine, the Ghost Lap AI, the counterfactual simulator, the strategy parliament, the explainability worker, the gateway, or the Mission Control surface.
-- New features that map cleanly to an unimplemented PRD section. The PRD lives in the repository root.
+- New features that map cleanly to an unimplemented layer of the architecture in `docs/ARCHITECTURE.md`.
 - New tests against existing code. We treasure tests.
 - Documentation improvements that preserve the Cognitive Twin Operating System positioning. Telemetry is infrastructure. Cognition is the product.
 
@@ -13,7 +13,7 @@ Welcome. NeuroPit is a real time Cognitive Twin Operating System for motorsport.
 
 - Pull requests that drift the project into telemetry analytics framing. Telemetry is infrastructure. Cognition is the product.
 - Pull requests that fork the API contract without updating the schemas in `src/backend/api/schemas.py` and the shared models in `src/backend/ingestion/models.py`.
-- Pull requests that swap the local first execution model for a hyperscale cloud commitment without a Master Build Plan amendment.
+- Pull requests that swap the local first execution model for a hyperscale cloud commitment without an architecture amendment in `docs/ARCHITECTURE.md`.
 
 ## Local development
 
