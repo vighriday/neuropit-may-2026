@@ -6,6 +6,14 @@ The intention is that someone landing on the repository for the first time can s
 
 ## [Unreleased]
 
+### IBM Granite via the community open source models
+
+- Granite client rewritten to default to local Hugging Face inference using `ibm-granite/granite-3.1-8b-instruct` from the [IBM Granite community](https://github.com/ibm-granite-community). No API key required. The model downloads from Hugging Face on first run and stays cached locally afterwards.
+- The client now runs three paths in priority order: local Hugging Face Granite first, IBM watsonx.ai cloud as an optional fallback when credentials are configured, and the deterministic templated stub last. Every path returns the same dictionary contract.
+- New `GRANITE_USE_LOCAL` setting in `src/backend/config.py` and in `.env.example`. The default is true so the open source path runs out of the box.
+- `transformers`, `accelerate`, `torch`, and `huggingface-hub` added to `src/backend/requirements.txt`.
+- Granite test suite rewritten to monkeypatch the pipeline loader and the httpx client so the unit run never downloads model weights and never touches a real watsonx endpoint. Two new tests cover the local path success and the local failure fallback to the stub.
+
 ### Brand and identity
 
 - NeuroPit logo committed at `NeuroPitLogo.png` (root, source asset), `src/frontend/public/neuropit-logo.png` (served by Next.js), and `docs/assets/neuropit-logo.png` (rendered inside markdown docs).
