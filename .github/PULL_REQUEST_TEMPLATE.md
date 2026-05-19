@@ -25,7 +25,7 @@ PRD section:
 ## Positioning impact
 
 - [ ] No user facing copy changed.
-- [ ] User facing copy changed. `docs/POSITIONING.md` consulted. No banned phrases introduced.
+- [ ] User facing copy changed. Cognitive Twin Operating System positioning preserved. No telemetry analytics, strategy copilot, or generic AI assistant framing introduced.
 
 ## Tests
 

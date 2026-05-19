@@ -1,13 +1,13 @@
 # Contributing to NeuroPit
 
-Welcome. NeuroPit is a real time Cognitive Twin Operating System for motorsport. The README, the architecture document, the cognitive methodology, the PRD compliance audit, and the canonical positioning document live in the `docs/` folder. Read those before you write code.
+Welcome. NeuroPit is a real time Cognitive Twin Operating System for motorsport. The README, the architecture document, the cognitive methodology, and the event taxonomy live in the `docs/` folder. Read those before you write code.
 
 ## What we accept
 
 - Bug fixes against the existing cognitive engine, the emotional state engine, the predictive failure engine, the Ghost Lap AI, the counterfactual simulator, the strategy parliament, the explainability worker, the gateway, or the Mission Control surface.
 - New features that map cleanly to an unimplemented PRD section. The PRD lives in the repository root.
 - New tests against existing code. We treasure tests.
-- Documentation improvements that preserve the Cognitive Twin Operating System positioning. Read `docs/POSITIONING.md` first.
+- Documentation improvements that preserve the Cognitive Twin Operating System positioning. Telemetry is infrastructure. Cognition is the product.
 
 ## What we do not accept by default
 
@@ -44,7 +44,7 @@ make integration
 
 1. Branch from `main`. Name the branch `feature/<short-slug>` or `fix/<short-slug>`.
 2. Write a unit test before the fix or feature. The unit suite must stay green.
-3. Update `docs/COGNITIVE_METHODOLOGY.md` if you adjust a weight. Update `docs/EVENT_TAXONOMY.md` if you add a topic. Update `docs/PRD_COMPLIANCE_AUDIT.md` if you move a section between DONE, PARTIAL, DEFERRED, or TODO. Update `CHANGELOG.md` under the Unreleased section.
+3. Update `docs/COGNITIVE_METHODOLOGY.md` if you adjust a weight. Update `docs/EVENT_TAXONOMY.md` if you add a topic. Update `CHANGELOG.md` under the Unreleased section.
 4. Open the pull request against `main`. Use the pull request template. Tick the boxes that apply.
 5. CI must pass. The unit suite, the import smoke, and the frontend type check all run on every pull request.
 

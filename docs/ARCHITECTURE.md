@@ -1,6 +1,6 @@
 # NeuroPit Architecture
 
-This is the working architecture document for NeuroPit V1. If you are reading this for the first time, start here. If you are about to add a new layer, update this file before you write a line of code. The Master Build Plan in `docs/MASTER_BUILD_PLAN.md` and the platform requirements document in the repo root describe what the system is supposed to do. This document describes how it is actually built.
+This is the working architecture document for NeuroPit V1. If you are reading this for the first time, start here. If you are about to add a new layer, update this file before you write a line of code.
 
 NeuroPit is a real time Cognitive Twin Operating System for motorsport. The car has been measured for decades. The mind inside the car has not. NeuroPit treats the driver as a probabilistic cognitive entity that can be inferred from the telemetry the car is already producing, and it does that under explainable AI principles a strategist can defend in a stewards meeting. Telemetry is infrastructure. Cognition is the product.
 
@@ -58,7 +58,7 @@ Topic names, partition counts, payload shapes, and ownership rules live in `docs
 
 ## Cognitive methodology
 
-The exact weights and reasoning behind every cognitive score live in `docs/COGNITIVE_METHODOLOGY.md`. Read that before adjusting the engine. The canonical product narrative lives in `docs/POSITIONING.md`. Read that before changing any user facing copy.
+The exact weights and reasoning behind every cognitive score live in `docs/COGNITIVE_METHODOLOGY.md`. Read that before adjusting the engine.
 
 ## Latency targets
 

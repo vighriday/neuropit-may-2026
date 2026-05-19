@@ -5,45 +5,65 @@
 [![CI](https://github.com/vighriday/NeuroPit/actions/workflows/ci.yml/badge.svg)](https://github.com/vighriday/NeuroPit/actions/workflows/ci.yml)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![IBM Granite](https://img.shields.io/badge/IBM-Granite-052FAD)](https://github.com/ibm-granite-community)
+[![IBM Docling](https://img.shields.io/badge/IBM-Docling-052FAD)](https://www.docling.ai)
+[![Langflow](https://img.shields.io/badge/Langflow-Orchestrated-1f7a8c)](https://www.langflow.org)
+[![Tests](https://img.shields.io/badge/tests-104%20passing-success)](tests/)
 
-NeuroPit is a real time Cognitive Twin Operating System for motorsport. Telemetry is infrastructure. Cognition is the product.
+> Real time Cognitive Twin Operating System for motorsport. Telemetry is infrastructure. Cognition is the product.
 
-Built for the IBM AI Builders Challenge powered by IBM SkillsBuild. Open source under Apache 2.0.
+NeuroPit is a probabilistic human state inference system for Formula racing. It does not optimise the car. It infers the driver. Built for the IBM AI Builders Challenge powered by IBM SkillsBuild.
 
-## Thesis
+---
 
-Telemetry can probabilistically reveal the hidden cognitive and emotional state of the driver. Every Formula team already measures the car. None of them meaningfully measures the human nervous system operating inside it. NeuroPit closes that gap.
+## The problem
 
-Other systems ask: what is happening to the car. NeuroPit asks: what is happening to the human nervous system operating the car. The category is Human Machine Cognitive Intelligence for Motorsport. The moat is real time probabilistic cognition inference from racing telemetry, paired with IBM Granite explainability grounded in the motorsport ontology.
+Modern Formula teams measure the car in extraordinary detail. They measure almost nothing about the driver. The pit wall sees laptimes, tyre temperatures, and brake bias positions, but it does not see whether the driver is mentally overloaded, whether confidence is collapsing, or whether panic is starting to accumulate after a near miss.
+
+A driver who has just survived a wet braking incident at three hundred kilometres per hour does not return to a neutral mental state on the next straight. Their steering becomes microscopically less stable. Their throttle commitment drops. Their heart rate variability tightens. These changes are invisible to the dashboard but they are present in the telemetry the car is already producing.
+
+That is the gap.
+
+## The solution
+
+NeuroPit treats the driver as a probabilistic cognitive entity that can be inferred from racing telemetry the team is already collecting. Every evaluation tick produces a nine score Cognitive Twin, a nine emotion distribution, a discrete persona label, a confidence band, an IBM Granite reasoning paragraph grounded in the motorsport cognition ontology, and a full audit trail.
+
+Other systems ask what is happening to the car. NeuroPit asks what is happening to the human nervous system operating the car. The category is Human Machine Cognitive Intelligence for Motorsport.
 
 ## What NeuroPit is not
 
 - Not a telemetry analytics dashboard.
 - Not a strategy copilot.
 - Not a generic AI racing assistant.
-- Not a telemetry insights tool.
 
-## What NeuroPit is
+NeuroPit is a Cognitive Twin Operating System. The dashboard, the REST endpoints, and the WebSocket are surfaces over the twin. They are not the product.
 
-A probabilistic human state inference system. The Cognitive Twin is the unit of value. Every other layer in the architecture exists to produce, ground, defend, and surface that twin.
+---
 
-## Cognitive pipeline
+## Core capabilities
 
-```text
-Telemetry
-  -> Behavioral Signal Extraction
-  -> Probabilistic Cognitive Inference
-  -> Emotional State Modeling
-  -> Persona Drift Detection
-  -> Explainable Human State Reasoning
-  -> Cognitive Strategy Intelligence
-```
-
-The pipeline is event driven from end to end. The car is measured. The driver is inferred. We do not pretend otherwise.
+| Capability | Module |
+| --- | --- |
+| Behavioural telemetry feature extraction | `src/backend/feature_engineering/signal_processor.py` |
+| Probabilistic Cognitive Inference Engine (nine score twin) | `src/backend/inference/cognitive_engine.py` |
+| Emotional State Engine (nine emotion distribution) | `src/backend/inference/emotional_state.py` |
+| Persona Drift state machine | `src/backend/common/persona.py` |
+| Predictive Failure Engine across four horizons | `src/backend/prediction/failure_engine.py` |
+| Ghost Lap AI (cognitive normalised laps) | `src/backend/simulation/ghost_lap.py` |
+| Counterfactual Simulation Engine | `src/backend/simulation/counterfactual.py` |
+| Multi Agent Strategy Parliament | `src/backend/strategy/parliament.py` |
+| IBM Granite explainable cognitive reasoning | `src/backend/reasoning/granite_client.py` |
+| IBM Docling motorsport cognition ontology | `src/backend/knowledge/docling_compiler.py` |
+| Qdrant retriever for grounded reasoning | `src/backend/knowledge/retriever.py` |
+| Trust and uncertainty layer | `src/backend/common/uncertainty.py` |
+| Audit log per cognitive decision | `src/backend/common/audit.py` |
+| Post race intelligence reporting | `src/backend/reporting/post_race.py` |
+| JWT cognitive gateway with role based access | `src/backend/api/gateway.py` |
+| Fernet biometric encryption at the source | `src/backend/security/crypto.py` |
+| Mission Control surface (Next.js) | `src/frontend/app/` |
 
 ## The full Cognitive Twin
 
-Every evaluation tick produces the nine score twin documented in PRD section fifteen.
+Every evaluation tick produces the nine score twin:
 
 - Stress score
 - Confidence score
@@ -55,147 +75,129 @@ Every evaluation tick produces the nine score twin documented in PRD section fif
 - Emotional drift score
 - Tunnel vision probability
 
-A discrete persona label (Panic, Aggressive, Fatigue, Defensive, Flow State, Recovery), a nine emotion probability distribution, and a `high` / `moderate` / `unstable` confidence band travel alongside on every emission.
+Plus a discrete persona label (Panic, Aggressive, Fatigue, Defensive, Flow State, Recovery), a nine emotion probability distribution, and a `high` / `moderate` / `unstable` confidence band that travels with every emission.
 
-## What ships in V1
+## IBM AI integration
 
-- Behavioral telemetry intelligence layer that derives per driver micro signals from OpenF1 and FastF1 streams replayed through Redpanda.
-- Probabilistic Cognitive Inference Engine that fuses behavioural signals with telemetry conditioned synthetic biometrics into the full nine score twin.
-- Dedicated Emotional State Engine emitting a normalised distribution across confidence, fear, panic, frustration, aggression, recovery, overconfidence, hesitation, and caution.
-- Persona drift state machine for behavioural mode transitions.
-- Predictive Failure Engine across the four PRD horizons (five seconds, one lap, three laps, full race).
-- Ghost Lap AI reconstructing cognitive normalised laps with per cause lost time attribution.
-- Counterfactual Simulation Engine covering the five canonical scenarios from PRD section twenty.
-- Multi Agent Strategy Parliament producing a defensible cognitive strategy recommendation.
-- IBM Granite explainable cognitive reasoning through watsonx.ai, with a local templated stub so the surface never goes dark.
-- IBM Docling motorsport cognition ontology compiled into Qdrant, plus a retriever that grounds every Granite reading.
-- Post race cognitive intelligence report assembling cognitive summary, confidence reconstruction, Ghost Lap, counterfactuals, and reasoning timeline per driver.
-- FastAPI cognitive gateway with JWT plus role based access (Team Principal, Race Strategist, Driver Engineer, Neuro Analyst) and Fernet at rest encryption for biometric payloads.
-- Telemetry replay tool that re publishes raw frames from InfluxDB onto the cognitive pipeline.
-- Mission Control surface in Next.js with dedicated Ghost Lap, Counterfactual, and Explainability views into the Cognitive Twin.
+| Tool | Role in NeuroPit |
+| --- | --- |
+| **IBM Granite** | Explainable cognitive reasoning. The Granite client runs the open source community models locally through Hugging Face transformers by default. Watsonx.ai cloud is available as an optional fallback. A deterministic templated stub ensures Mission Control never goes dark. |
+| **IBM Docling** | Motorsport cognition knowledge compiler. Ingests FIA reports, neuroscience papers, telemetry manuals, and historical race documents into the Qdrant `motorsport_ontology` collection used to ground every Granite reasoning call. |
+| **Langflow** | Reference orchestration flow at `orchestration/langflow/neuropit_strategy_flow.json`. Visualises the cognitive strategy pipeline. |
+
+The cognitive pipeline calls Granite with **physics first reasoning**: every score the model sees has already been computed deterministically from the engineered features. Granite is strictly forbidden from inventing cognitive numbers. It only explains them.
+
+---
+
+## System architecture
+
+```mermaid
+flowchart TD
+    A[OpenF1 / FastF1] --> B[Historical Race Streamer]
+    B --> C[Redpanda<br/>incoming-telemetry-raw]
+    C --> D[Behavioural Feature Engine]
+    C --> E[InfluxDB raw telemetry]
+    D --> F[Telemetry Features Topic]
+    F --> G[Biometric Synthesiser<br/>Fernet encrypted at source]
+    G --> H[Biometrics Topic]
+    F --> I[Probabilistic Cognitive<br/>Inference Engine]
+    H --> I
+    I --> J[Cognitive State Topic]
+    J --> K[Emotional State Engine]
+    J --> L[Predictive Failure Engine]
+    J --> M[IBM Granite Explainable<br/>Cognitive Reasoning]
+    N[IBM Docling Ontology] --> O[Qdrant Retriever]
+    O --> M
+    K --> P[Emotional Events Topic]
+    M --> Q[Explanation Events Topic]
+    J --> R[FastAPI Cognitive Gateway<br/>JWT + RBAC]
+    P --> R
+    Q --> R
+    R --> S[Mission Control<br/>Next.js + WebSocket]
+    R --> T[Ghost Lap REST]
+    R --> U[Counterfactual REST]
+    R --> V[Parliament REST]
+    R --> W[Post Race Report REST]
+    I --> X[Audit Log JSONL]
+    M --> X
+```
+
+Telemetry flows in. The Cognitive Twin flows out. Every emission carries a confidence band, a written explanation, and an audit trail.
+
+---
 
 ## Quick start
 
-You will need Python 3.11 or newer, Node 20 or newer, and Docker.
+Requires Python 3.11+, Node 20+, and Docker.
 
 ```bash
+git clone https://github.com/vighriday/NeuroPit.git
+cd NeuroPit
 cp .env.example .env
+
 make install
-make infra-up
-make bootstrap
-make backend          # one terminal
-make gateway          # another terminal
-make stream           # another terminal
+make infra-up           # Redpanda + InfluxDB + Qdrant in Docker
+make bootstrap          # Kafka topics + Qdrant collections
+
+make backend            # terminal 1: cognitive pipeline workers
+make gateway            # terminal 2: FastAPI cognitive gateway
+make stream             # terminal 3: playback historical session
+
 cd src/frontend && npm install && npm run dev
 ```
 
-Open `http://localhost:3000`. Within ten seconds the live link banner switches to LIVE TELEMETRY and the Cognitive Twin starts streaming.
+Open `http://localhost:3000`. Within ten seconds the cognitive trajectory starts streaming.
 
-Step by step demo script in [`docs/DEMO_RUNBOOK.md`](docs/DEMO_RUNBOOK.md). Canonical narrative in [`docs/POSITIONING.md`](docs/POSITIONING.md).
+### Tech stack
 
-## Architecture
+| Layer | Technology |
+| --- | --- |
+| Frontend | Next.js 14, React 18, TypeScript, Tailwind, Recharts, Lucide |
+| Gateway | FastAPI, WebSocket, JWT (python-jose), Fernet (cryptography) |
+| Cognitive pipeline | Python 3.12, NumPy, SciPy, scikit-learn |
+| Streaming | Redpanda (Kafka compatible), confluent-kafka |
+| Time series | InfluxDB 2 |
+| Vector store | Qdrant + sentence-transformers |
+| Reasoning | IBM Granite via Hugging Face transformers (local) or watsonx.ai (cloud) |
+| Knowledge | IBM Docling |
+| Orchestration | Langflow reference flow |
+| Telemetry source | OpenF1 + FastF1 |
 
-```text
-                +-------------------------+
-                |   OpenF1 / FastF1       |
-                +-------------+-----------+
-                              |
-                              v
-                +-------------------------+
-                |  Historical Race Streamer|
-                +-------------+-----------+
-                              |
-                              v
-                Redpanda  (incoming-telemetry-raw)
-                              |
-       +----------------------+---------------------+
-       |                                            |
-       v                                            v
-+----------------+                          +----------------+
-| Behavioral     |                          | InfluxDB write |
-| signal engine  |                          +----------------+
-+--------+-------+
-         |
-         v
-   telemetry-features
-         |
-         v
-+----------------+
-| Biometric synth|
-| (telemetry     |
-|  conditioned)  |
-+--------+-------+
-         |
-         v
-   biometrics-enriched
-         |
-         v
-+-------------------------+
-| Probabilistic Cognitive |
-| Inference Engine        |
-| (full nine score twin)  |
-+-----------+-------------+
-            |
-            +--------------------+--------------------+
-            |                    |                    |
-            v                    v                    v
-+-------------------+   +---------------------+   +----------------+
-| Emotional State   |   | Predictive failure  |   | InfluxDB write |
-| Engine            |   | engine              |   +----------------+
-+-------------------+   +---------------------+
-            |
-            v
-+-------------------+
-| IBM Granite       |
-| explainable       |
-| cognitive reason  |
-| + Qdrant grounding|
-+--------+----------+
-         |
-         v
-+-------------------------+
-| Cognitive Gateway (JWT) |
-+-----------+-------------+
-            |
-            v
-+-------------------------+
-| Mission Control surface |
-|  + Ghost Lap            |
-|  + Counterfactual       |
-|  + Explainability       |
-+-------------------------+
-```
+---
 
-Full architecture at [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). Topic taxonomy at [`docs/EVENT_TAXONOMY.md`](docs/EVENT_TAXONOMY.md). Cognitive methodology at [`docs/COGNITIVE_METHODOLOGY.md`](docs/COGNITIVE_METHODOLOGY.md). PRD compliance map at [`docs/PRD_COMPLIANCE_AUDIT.md`](docs/PRD_COMPLIANCE_AUDIT.md).
+## Why this matters
 
-## Cognitive Inference Methodology
+Every Formula team already pays seven figures a year for telemetry analytics. None of them, today, has a credible cognitive twin of the driver. NeuroPit closes that gap with an interpretable, audited, explainable architecture that a strategist can defend in a stewards meeting.
 
-NeuroPit V1 uses a probabilistic cognitive inference architecture where cognitive states are derived from telemetry behaviour, synthetic physiological signals, environmental conditions, and race context variables through weighted deterministic inference functions. This was selected on purpose. It maximises explainability, preserves deterministic reasoning, supports IBM trustworthy AI principles, and gives the system a stable foundation for the learned behavioral models that will replace these functions in later phases.
-
-The exact weights and their reasoning live in `docs/COGNITIVE_METHODOLOGY.md`. Every cognitive emission carries the active weight version so historical replays remain reproducible after the constants move.
+The same abstraction generalises beyond Formula racing into aviation, defence, surgery, esports, and elite athletics. Anywhere a trained human nervous system operates a high stakes machine, the Cognitive Twin Operating System pattern applies.
 
 ## Tests
 
 ```bash
-make test              # unit suite, no broker required
-make integration       # smoke tests against a running Redpanda
+make test              # 104 unit tests, no infrastructure required
+make integration       # smoke tests, requires Redpanda running
 ```
 
-The unit suite is the safety net for every cognitive equation, every persona rule, every prediction horizon, every counterfactual scenario, every Granite path, every cognitive gateway route, and every security helper.
+CI runs the backend unit suite and the frontend type check on every push and every pull request.
 
-## IBM Granite
+## Roadmap
 
-NeuroPit uses the open source IBM Granite community models from `https://github.com/ibm-granite-community` and `https://huggingface.co/ibm-granite`. The default model is `ibm-granite/granite-3.1-8b-instruct`. The Granite client runs three paths in order: local Hugging Face inference first (no API key, no network after the first model download), IBM watsonx.ai as an optional cloud fallback when credentials are configured, and a deterministic templated stub last so the Mission Control surface never goes dark.
+- **Phase 1 (shipped, v0.3.0):** Full nine score Cognitive Twin, Emotional State Engine, all PRD layers, JWT gateway, Mission Control surface, OSS community files, GitHub Actions CI.
+- **Phase 2:** Statistical adaptation. Rolling baselines, telemetry normalisation, adaptive thresholds per driver.
+- **Phase 3:** Learned behavioural models. Lightweight temporal classifiers on the existing feature inputs without changing the cognitive twin output contract.
+- **Phase 4:** Multimodal cognitive transformer. Reinforcement learning. Personalised driver twins. Live wearable biometrics replacing the synthetic stream.
 
-Pick the path with the environment variables `GRANITE_USE_LOCAL`, `GRANITE_USE_STUB`, `WATSONX_API_KEY`, and `WATSONX_PROJECT_ID`. The defaults in `.env.example` keep the system on local Hugging Face inference.
+The architecture is built so each phase swaps the inference function without rewriting the surface contract.
 
-## Optional cloud paths
+## Documentation
 
-The cloud paths are optional. When watsonx.ai credentials and the Qdrant cloud cluster are not configured, NeuroPit runs entirely on the local stack with local Hugging Face Granite inference and the local Qdrant Docker container.
-
-- IBM watsonx.ai API key and project id if you want to offload Granite inference to IBM Cloud.
-- InfluxDB Cloud free tier bucket called `neuropit-telemetry` if you do not want to rely on the local Docker image.
-- Qdrant Cloud free tier cluster for hosted motorsport cognition ontology storage.
+- [Architecture](docs/ARCHITECTURE.md)
+- [Cognitive methodology and weights](docs/COGNITIVE_METHODOLOGY.md)
+- [Kafka event taxonomy](docs/EVENT_TAXONOMY.md)
+- [Changelog](CHANGELOG.md)
+- [Contributing](CONTRIBUTING.md)
+- [Security policy](SECURITY.md)
+- [Code of conduct](CODE_OF_CONDUCT.md)
 
 ## Licence
 
