@@ -74,6 +74,32 @@ def _ensure_hf_env_propagated() -> None:
             os.environ[key] = value
 
 
+def _resolve_local_snapshot(model_id: str) -> str:
+    """Return a filesystem path to an extracted snapshot if one exists.
+
+    When HF_HUB_CACHE holds a previously downloaded snapshot whose blob
+    layout is incomplete (e.g. the shards were written into snapshots/
+    without matching blob symlinks), the standard from_pretrained call
+    re-fetches via the xet protocol. Loading the snapshot directory
+    directly bypasses that and re-uses the bytes already on disk.
+    """
+    cache_root = os.environ.get("HF_HUB_CACHE") or os.environ.get("HF_HOME") or ""
+    if not cache_root or "/" not in model_id:
+        return model_id
+    repo_dir = os.path.join(cache_root, "models--" + model_id.replace("/", "--"))
+    refs_main = os.path.join(repo_dir, "refs", "main")
+    if not os.path.isfile(refs_main):
+        return model_id
+    with open(refs_main, "r", encoding="utf-8") as fh:
+        rev = fh.read().strip()
+    snapshot_dir = os.path.join(repo_dir, "snapshots", rev)
+    if not os.path.isdir(snapshot_dir):
+        return model_id
+    if not os.path.isfile(os.path.join(snapshot_dir, "config.json")):
+        return model_id
+    return snapshot_dir
+
+
 def _load_local_pipeline(model_id: str):
     """Lazily load the Hugging Face Granite pipeline.
 
@@ -92,13 +118,23 @@ def _load_local_pipeline(model_id: str):
         import torch
 
         device = "cuda" if torch.cuda.is_available() else "cpu"
-        dtype = torch.float16 if device == "cuda" else torch.float32
+        # bf16 on CPU halves resident memory vs float32. Granite 3.1 8B
+        # weighs in around 16 GB in fp32; on a 16 GB workstation that is
+        # the difference between loading and being killed by the OOM
+        # killer. Modern CPUs ship native bf16 matmul, so latency is
+        # comparable.
+        dtype = torch.float16 if device == "cuda" else torch.bfloat16
 
-        tokenizer = AutoTokenizer.from_pretrained(model_id)
+        resolved = _resolve_local_snapshot(model_id)
+        if resolved != model_id:
+            logger.info("Loading Granite from local snapshot %s", resolved)
+
+        tokenizer = AutoTokenizer.from_pretrained(resolved)
         model = AutoModelForCausalLM.from_pretrained(
-            model_id,
+            resolved,
             torch_dtype=dtype,
             device_map="auto" if device == "cuda" else None,
+            low_cpu_mem_usage=True,
         )
         if device == "cpu":
             model = model.to(device)
@@ -173,7 +209,7 @@ class GraniteClient:
 
         outputs = generator(
             prompt,
-            max_new_tokens=220,
+            max_new_tokens=90,
             do_sample=False,
             num_return_sequences=1,
             pad_token_id=generator.tokenizer.eos_token_id,

@@ -34,5 +34,7 @@ print(f"target: {TARGET}", flush=True)
 print(f"HF_HUB_CACHE={os.environ['HF_HUB_CACHE']}", flush=True)
 print(f"TMPDIR={os.environ['TMPDIR']}", flush=True)
 
-path = snapshot_download("ibm-granite/granite-3.1-8b-instruct", cache_dir=HUB)
+model_id = os.environ.get("GRANITE_MODEL_ID", "ibm-granite/granite-3.0-2b-instruct")
+print(f"model: {model_id}", flush=True)
+path = snapshot_download(model_id, cache_dir=HUB)
 print(f"DONE -> {path}", flush=True)

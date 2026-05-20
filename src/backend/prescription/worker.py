@@ -23,7 +23,6 @@ from confluent_kafka import Consumer, Producer
 from src.backend.common import audit
 from src.backend.config import get_settings
 from src.backend.prescription.engine import PrescriptionEngine
-from src.backend.reasoning.granite_client import GraniteClient
 
 logger = logging.getLogger(__name__)
 
@@ -46,30 +45,35 @@ class PrescriptionWorker:
             }
         )
         self.producer = Producer({"bootstrap.servers": self.broker_url})
-        self.consumer.subscribe(["cognitive-state-inference", "anomaly-events"])
+        self.consumer.subscribe(
+            ["cognitive-state-inference", "anomaly-events", "explanation-events"]
+        )
 
         self.engine = PrescriptionEngine()
         self.latest_forecast: Dict[str, dict] = {}
-        self.granite = GraniteClient(settings)
+        # Per driver cache of the most recent Granite explanation. We
+        # consume it off the bus rather than loading our own copy of the
+        # 8B model so a 16 GB workstation can run the prescription
+        # worker alongside the explainability worker.
+        self.latest_granite: Dict[str, dict] = {}
 
     def _enrich_with_granite(self, prescription_dict: dict, state: dict) -> dict:
-        try:
-            hint = (
-                f"Primary action {prescription_dict['primary']['label']} "
-                f"with efficiency {prescription_dict['optimality']['cognitive_efficiency']:.0f}/100. "
-                f"Estimated lap delta {prescription_dict['optimality']['performance_lost_s']:.2f}s."
-            )
-            explanation = self.granite.explain(state, prompt_hint=hint)
-            return explanation
-        except Exception as exc:
-            logger.debug("Granite enrichment skipped: %s", exc)
-            return {}
+        driver_id = str(state.get("driver_id") or "")
+        return self.latest_granite.get(driver_id, {})
 
     def _handle_anomaly(self, data: dict) -> None:
         driver_id = str(data.get("driver_id") or "")
         if not driver_id:
             return
         self.latest_forecast[driver_id] = data
+
+    def _handle_explanation(self, data: dict) -> None:
+        driver_id = str(data.get("driver_id") or "")
+        if not driver_id:
+            return
+        explanation = data.get("explanation") or {}
+        if explanation:
+            self.latest_granite[driver_id] = explanation
 
     def _handle_cognitive(self, data: dict) -> None:
         driver_id = str(data.get("driver_id") or "")
@@ -114,6 +118,8 @@ class PrescriptionWorker:
                     continue
                 if topic == "anomaly-events":
                     self._handle_anomaly(data)
+                elif topic == "explanation-events":
+                    self._handle_explanation(data)
                 elif topic == "cognitive-state-inference":
                     self._handle_cognitive(data)
         except KeyboardInterrupt:

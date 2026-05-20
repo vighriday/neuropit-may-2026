@@ -31,6 +31,10 @@ class ExplainabilityWorker:
                 "bootstrap.servers": self.broker_url,
                 "group.id": "explainability_worker_group",
                 "auto.offset.reset": "latest",
+                # Granite CPU inference can take >60s per paragraph.
+                # The default 300s poll interval evicts the consumer
+                # from the group mid-generation and discards work.
+                "max.poll.interval.ms": 1800000,
             }
         )
         self.producer = Producer({"bootstrap.servers": self.broker_url})
