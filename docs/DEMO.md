@@ -13,7 +13,7 @@ A run order judges or recruiters can follow without you in the room. Assumes the
 | 02:30 | Reasoning panel | Read one paragraph. | Confirm the `via granite-local` source label. Hover the grounded passages to see the motorsport ontology citations. |
 | 03:00 | Prescriptive Engine panel | Point at the cognitive efficiency score and the seconds-left-on-the-table number. Read the primary prescribed action and the triggers that fired. | Projected post-action efficiency is rendered next to the action label. Alternatives are ranked. Guardrail-blocked actions are clearly tagged. |
 | 03:45 | What-If drawer | Top-right button. Pick the **Drop HR to calm baseline** preset, hit **Run replay**. | The chart fans baseline vs counterfactual stress and confidence side by side. The divergence summary calls out which axis moved most. This is grounded in audit-log data, not synthetic priors. |
-| 04:15 | Audit log | Open any `audit_logs/cognitive-*.jsonl` in a tail. | Point at `score_inputs`, `weights`, `model_source`. The audit row is written *before* the WebSocket emit. Every prescription is audited the same way. |
+| 04:15 | Audit log | Open any `audit_logs/cognitive-*.jsonl` in a tail. | Point at the score inputs, the weights snapshot, and the model source. Every cognitive evaluation, every prescription, and every what-if replay writes its audit row before the matching Kafka emit. |
 | 04:45 | Close | Land the differentiator. | Other systems ask what is happening to the car. NeuroPit infers the human nervous system operating the car, prescribes the next pit-wall action, and lets the strategist defend the call after the fact. |
 
 ## What good looks like

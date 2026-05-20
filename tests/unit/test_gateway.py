@@ -59,6 +59,37 @@ def test_token_endpoint_rejects_unknown_role(client):
     assert response.status_code == 400
 
 
+def test_token_endpoint_returns_expiry_payload(client):
+    response = client.post(
+        "/auth/token",
+        json={"subject": "mission-control", "role": "race_strategist"},
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["access_token"]
+    assert body["token_type"] == "bearer"
+    assert body["expires_in_seconds"] > 0
+    assert body["expires_at"]
+    # expires_at is parseable ISO-8601 with timezone.
+    from datetime import datetime
+    parsed = datetime.fromisoformat(body["expires_at"])
+    assert parsed.tzinfo is not None
+
+
+def test_cors_preflight_uses_explicit_origin(client):
+    response = client.options(
+        "/auth/token",
+        headers={
+            "Origin": "http://localhost:3001",
+            "Access-Control-Request-Method": "POST",
+            "Access-Control-Request-Headers": "content-type",
+        },
+    )
+    assert response.status_code in (200, 204)
+    allow_origin = response.headers.get("access-control-allow-origin")
+    assert allow_origin in {"http://localhost:3001", "*"}
+
+
 def test_ghost_lap_endpoint(client):
     token = _token(client, "driver_engineer")
     response = client.post(

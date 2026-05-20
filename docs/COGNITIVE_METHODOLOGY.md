@@ -195,6 +195,68 @@ The recomputation in `replay.py` mirrors `CognitiveInferenceEngine.evaluate` lin
 
 What If is grounded in real session data. It is not a synthetic counterfactual. The strategist can defend the result because the inputs are the exact ones the system saw at race time.
 
+## Supplementary score weights
+
+The five envelope dimensions above carry most of the laptime relevant signal, but the dashboard also surfaces four supplementary scores. Their weights are versioned in `src/backend/common/weights.py` and stamped into every audit row.
+
+### Cognitive load (`CognitiveLoadWeights`)
+
+A convex blend of the inputs that grow the driver's processing burden.
+
+| Weight | Field | Value |
+| --- | --- | --- |
+| `micro_correction` | micro correction frequency | 0.25 |
+| `throttle_jitter` | throttle jitter | 0.20 |
+| `panic` | panic oscillation | 0.20 |
+| `stress` | live stress score | 0.35 |
+
+### Attention stability (`AttentionStabilityWeights`)
+
+Higher is better. Destabilising signals are inverted before they enter the blend.
+
+| Weight | Field | Value |
+| --- | --- | --- |
+| `confidence` | live confidence score | 0.40 |
+| `inv_stress` | 100 minus stress | 0.25 |
+| `inv_steering_instability` | 100 minus steering instability | 0.20 |
+| `inv_micro_correction` | 100 minus micro correction | 0.15 |
+
+### Strategic reliability (`StrategicReliabilityWeights`)
+
+Likelihood of executing the planned race strategy.
+
+| Weight | Field | Value |
+| --- | --- | --- |
+| `confidence` | live confidence score | 0.35 |
+| `attention` | attention stability | 0.30 |
+| `inv_fatigue` | 100 minus fatigue | 0.20 |
+| `inv_panic` | 100 minus panic probability | 0.15 |
+
+### Panic probability (`PanicProbabilityWeights`)
+
+Discrete probability that the driver tips into a panic episode.
+
+| Weight | Field | Value |
+| --- | --- | --- |
+| `panic_oscillation_gain` | gain on the high frequency steering signature | 3.5 |
+| `stress_term` | weight on live stress | 0.45 |
+| `tunnel_vision_term` | weight on the tunnel vision flag | 0.25 |
+
+### Predictive Failure Engine (`FailureForecastWeights`)
+
+The Predictive Failure Engine in `src/backend/prediction/failure_engine.py` projects six race critical failure probabilities across four horizons. Each probability is a convex combination, then each horizon scales the result by the listed decay so the further out the forecast, the lower the confidence.
+
+| Probability | Inputs (weight) |
+| --- | --- |
+| `crash_likelihood` | tunnel vision (0.5), stress (0.3), inverse confidence (0.2) |
+| `lock_up_probability` | stress (0.6), inverse confidence (0.4) |
+| `spin_probability` | inverse confidence (0.5), stress (0.3), Panic persona flag (0.2) |
+| `failed_overtake_probability` | inverse confidence (0.5), Defensive or Fatigue persona flag (0.5), default 0.2 otherwise |
+| `concentration_collapse` | fatigue (0.4), recent stress (0.4), Fatigue persona flag (0.2) |
+| `strategic_noncompliance` | Aggressive persona flag (0.5), stress (0.3), inverse confidence (0.2) |
+
+Horizon decay: `5s` 1.00, `1lap` 0.85, `3laps` 0.70, `full_race` 0.55.
+
 ---
 
 NeuroPit · Built by Hriday Vig · IBM AI Builders Challenge 2026 powered by IBM SkillsBuild.

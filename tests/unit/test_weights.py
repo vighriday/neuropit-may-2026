@@ -32,8 +32,35 @@ def test_snapshot_contains_every_section():
         "strategic_reliability",
         "panic_probability",
         "emotional_drift",
+        "failure_forecast",
         "persona",
     }
+
+
+def test_failure_forecast_weights_sum_to_one_per_probability():
+    fw = weights.FAILURE
+    assert fw.crash_tunnel + fw.crash_stress + fw.crash_inv_confidence == 1.0
+    assert fw.lockup_stress + fw.lockup_inv_confidence == 1.0
+    assert fw.spin_inv_confidence + fw.spin_stress + fw.spin_panic_persona == 1.0
+    assert (
+        fw.overtake_inv_confidence + fw.overtake_defensive_fatigue_persona == 1.0
+    )
+    assert (
+        fw.collapse_fatigue + fw.collapse_stress_recent + fw.collapse_fatigue_persona == 1.0
+    )
+    assert (
+        fw.noncompliance_aggressive_persona
+        + fw.noncompliance_stress
+        + fw.noncompliance_inv_confidence
+        == 1.0
+    )
+
+
+def test_failure_horizon_decay_is_monotonic():
+    fw = weights.FAILURE
+    horizons = [fw.horizon_5s, fw.horizon_1lap, fw.horizon_3laps, fw.horizon_full_race]
+    assert horizons == sorted(horizons, reverse=True)
+    assert 0.0 < horizons[-1] < horizons[0] <= 1.0
 
 
 def test_dataclasses_are_frozen():

@@ -28,7 +28,7 @@ The seven things that differentiate NeuroPit are the Cognitive Twin, the Emotion
 
 ## Logical layers
 
-We organise the runtime into five tiers. Each tier owns a small number of layers. Each layer owns a small number of files.
+We organise the runtime into six tiers. Each tier owns a small number of layers. Each layer owns a small number of files.
 
 Tier A is acquisition. It contains the data acquisition layer that pulls historical telemetry from OpenF1 and FastF1, and the event streaming layer that fans that telemetry out through Redpanda.
 

@@ -13,7 +13,7 @@
 [![IBM Granite](https://img.shields.io/badge/IBM-Granite-052FAD?logo=ibm)](https://github.com/ibm-granite-community)
 [![IBM Docling](https://img.shields.io/badge/IBM-Docling-052FAD?logo=ibm)](https://www.docling.ai)
 [![Langflow](https://img.shields.io/badge/Langflow-Orchestrated-1f7a8c)](https://www.langflow.org)
-[![Tests](https://img.shields.io/badge/tests-131%20passing-brightgreen)](tests/)
+[![Tests](https://img.shields.io/badge/tests-153%20passing-brightgreen)](tests/)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-3776AB?logo=python&logoColor=white)](https://www.python.org)
 [![Next.js 14](https://img.shields.io/badge/Next.js-14-000000?logo=nextdotjs)](https://nextjs.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
@@ -239,8 +239,8 @@ cd src/frontend && npm install && npm run dev
 
 1. **Mission Control pit-wall** at `http://localhost:3000` — driver selector, four primary cognitive rings, persona drift strip, IBM Granite reasoning panel.
 2. **Reasoning panel** — confirm every paragraph is labelled `via granite-local` and cites motorsport ontology passages.
-3. **REST endpoints** — `GET /api/cognitive/{driver_id}` returns the latest twin with confidence band.
-4. **Audit log** — open any file under `audit_logs/cognitive-*.jsonl`. Every event carries `score_inputs`, `weights`, `model_source`, and the Granite reasoning paragraph.
+3. **Live channels** — open `ws://localhost:8000/ws/cognitive` (any WebSocket client) for the live fan-out of cognitive, emotional, anomaly, explanation, and prescription events.
+4. **Audit log** — open any file under `audit_logs/cognitive-*.jsonl`. Every event carries its score inputs, the weights used, the model source, and (for explanation rows) the Granite reasoning paragraph.
 5. **Methodology** — every weight is documented in [`docs/COGNITIVE_METHODOLOGY.md`](docs/COGNITIVE_METHODOLOGY.md).
 
 If any step fails, the troubleshooting checklist lives under the FAQ at the bottom of this README.
@@ -251,11 +251,11 @@ If any step fails, the troubleshooting checklist lives under the FAQ at the bott
 
 | Rubric criterion | Where to look |
 | --- | --- |
-| **IBM Granite usage** | [`src/backend/reasoning/granite_client.py`](src/backend/reasoning/granite_client.py) — Granite 3.1 8B Instruct via Hugging Face, ontology-grounded prompts, deterministic stub fallback, watsonx.ai optional path. Every reasoning event ships with `model_source`. |
+| **IBM Granite usage** | [`src/backend/reasoning/granite_client.py`](src/backend/reasoning/granite_client.py) — Granite 3.0 2B Instruct via Hugging Face by default (drop-in upgrade to Granite 3.1 8B by flipping `GRANITE_MODEL_ID`), ontology-grounded prompts, deterministic stub fallback, watsonx.ai optional path. Every reasoning event ships with its `model_source`. |
 | **IBM Docling usage** | [`src/backend/knowledge/docling_compiler.py`](src/backend/knowledge/docling_compiler.py) — compiles FIA reports, neuroscience papers, and racing literature into a Qdrant collection. Retrieved at every Granite call. |
 | **Langflow usage** | [`orchestration/langflow/neuropit_strategy_flow.json`](orchestration/langflow/neuropit_strategy_flow.json) — importable visual flow. |
 | **Innovation** | Three-tier system: diagnostic Cognitive Twin, prescriptive engine with typed action space and Optimality Gap against a per-driver Performance Envelope, audit-log-driven What-If Replay that lets the strategist re-run real session data under a mutated input. Nobody else ships this stack. |
-| **Technical depth** | Event-driven Redpanda pipeline, InfluxDB time-series persistence, Qdrant vector grounding, FastAPI WebSocket fan-out, JWT + RBAC, Fernet encryption at source, 131 unit tests, GitHub Actions CI. |
+| **Technical depth** | Event-driven Redpanda pipeline, InfluxDB time-series persistence, Qdrant vector grounding, FastAPI WebSocket fan-out, JWT + RBAC, Fernet encryption at source, 153 unit tests, GitHub Actions CI. |
 | **Explainability** | Every output ships with a Granite paragraph, a confidence band, and a JSONL audit row. Physics-first reasoning forbids Granite from inventing cognitive numbers. |
 | **Impact** | Closes the seven-figure gap between telemetry analytics and driver state. Generalises to aviation, defence, surgery, esports, and elite athletics. |
 | **Demo readiness** | One `make` command per terminal. Mission Control pit-wall shows the Cognitive Twin emitting within ten seconds of stream start. |
@@ -290,7 +290,7 @@ A minute-by-minute run order judges or recruiters can follow without you in the 
 | Knowledge | IBM Docling |
 | Orchestration | Langflow reference flow |
 | Telemetry source | OpenF1 + FastF1 |
-| Tests | pytest, 131 unit tests, integration tests gated on infra |
+| Tests | pytest, 153 unit tests, integration tests gated on infra |
 | CI | GitHub Actions on every push and pull request |
 
 ---
@@ -300,8 +300,8 @@ A minute-by-minute run order judges or recruiters can follow without you in the 
 NeuroPit runs on real driver-state inference. Trust is part of the contract.
 
 - **Encryption at source.** Biometric channels are Fernet-encrypted before they hit Kafka. The key lives in `.env`, never in code.
-- **JWT + RBAC.** The cognitive gateway enforces four roles: Team Principal, Race Strategist, Driver Engineer, Neuro Analyst. Every WebSocket subscription and REST call validates the role.
-- **Immutable audit.** Every cognitive evaluation writes a JSONL row to `audit_logs/cognitive-*.jsonl` before the result is published. If the audit write fails, the emission is dropped.
+- **JWT + RBAC.** The cognitive gateway enforces four roles: Team Principal, Race Strategist, Driver Engineer, Neuro Analyst. Every WebSocket subscription and REST call validates the role and required scopes.
+- **Audit before broadcast.** Every cognitive evaluation, prescription, and what-if replay is appended to `audit_logs/cognitive-*.jsonl` before the matching Kafka or WebSocket emit. If the audit append raises, the emit is skipped and the engine logs the drop.
 - **Confidence bands, always.** No output ever leaves the engine without a `high` / `moderate` / `unstable` band attached.
 - **Physics-first reasoning.** Granite is shown precomputed scores. It cannot invent cognitive numbers.
 
@@ -312,7 +312,7 @@ Vulnerability disclosure procedure lives in [`SECURITY.md`](SECURITY.md).
 ## Tests
 
 ```bash
-make test              # 131 unit tests, no infrastructure required
+make test              # 153 unit tests, no infrastructure required
 make integration       # integration smoke tests, requires Redpanda running
 ```
 
@@ -343,7 +343,7 @@ A hackathon-trained neural network on synthetic data looks like AI on the slide 
 Granite is a generative model. If a strategist is going to defend a pit call against a steward, they cannot defend a number a generative model invented. Granite is shown precomputed deterministic scores and reasons over them. It explains. It does not generate the score.
 
 **Do I need watsonx credentials?**
-No. The default Granite path is local Hugging Face inference of `ibm-granite/granite-3.1-8b-instruct`. Watsonx is an optional fallback. The deterministic templated stub is a third fallback so Mission Control never goes dark.
+No. The default Granite path is local Hugging Face inference of `ibm-granite/granite-3.0-2b-instruct` (around 4 GB on disk, fits on a 16 GB workstation). To upgrade to the 8B model, set `GRANITE_MODEL_ID=ibm-granite/granite-3.1-8b-instruct` in `.env` and re-run `python scripts/download_granite.py`. Watsonx.ai is an optional cloud fallback. The deterministic templated stub is a third fallback so Mission Control never goes dark.
 
 **Where do biometrics come from?**
 The biometric synthesiser conditions heart rate, HRV, and respiration on telemetry features. They are clearly labelled `synthetic_*` everywhere they appear. Phase 4 swaps the synthesiser for a live wearable stream without changing the cognitive engine.
@@ -382,7 +382,7 @@ Apache 2.0. Copyright 2026 Hriday Vig. See [`LICENSE`](LICENSE) and [`NOTICE`](N
 
 **Hriday Vig** · [github.com/vighriday](https://github.com/vighriday) · `vighriday@gmail.com`
 
-NeuroPit was conceived, designed, and built solo by Hriday Vig for the **IBM AI Builders Challenge 2026 — Racing Innovation Challenge**, powered by IBM SkillsBuild. Every commit is signed by the author. The architecture, the methodology, the surface, and the open-source posture are the work of one builder.
+NeuroPit was conceived, designed, and built solo by Hriday Vig for the **IBM AI Builders Challenge 2026 — Racing Innovation Challenge**, powered by IBM SkillsBuild. The architecture, the methodology, the surface, and the open-source posture are the work of one builder.
 
 If you are a recruiter, a judge, or a Formula team interested in the Cognitive Twin Operating System category, the inbox is open.
 

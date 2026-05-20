@@ -60,3 +60,21 @@ def test_horizon_weight_decays_with_distance():
     five_sec = payload["horizons"]["5s"]["crash_likelihood"]
     full_race = payload["horizons"]["full_race"]["crash_likelihood"]
     assert five_sec >= full_race
+
+
+def test_engine_pulls_constants_from_weights_module():
+    import pytest
+
+    from src.backend.common import weights
+
+    engine = _engine()
+    fw = weights.FAILURE
+    payload = engine.forecast(
+        _state(stress_score=100.0, confidence_score=0.0, tunnel_vision_prob=100.0, persona_state="Aggressive")
+    )
+    # crash_likelihood at the 5s horizon is the convex blend clamped to 1
+    # then scaled by horizon_5s. With all three inputs maxed it must
+    # equal the sum of crash_tunnel + crash_stress + crash_inv_confidence
+    # clamped to 1, scaled by horizon_5s.
+    expected = min(fw.crash_tunnel + fw.crash_stress + fw.crash_inv_confidence, 1.0) * fw.horizon_5s
+    assert payload["horizons"]["5s"]["crash_likelihood"] == pytest.approx(expected, abs=1e-3)

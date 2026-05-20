@@ -1,40 +1,72 @@
-"""Download IBM Granite 3.1 8B Instruct to D:\\huggingface only.
+"""Download an IBM Granite model into a cache directory of your choice.
 
-Forces every HF cache path (hub, xet, tmp) onto D: so the download cannot
-fall back to C:. Run with:
+Defaults are picked so the script works on every platform without
+touching the system drive:
+
+* On Linux and macOS the cache goes to ``~/.cache/huggingface`` (the
+  normal Hugging Face default).
+* On Windows it goes to ``D:\\huggingface`` if the D drive exists,
+  otherwise ``%USERPROFILE%\\.cache\\huggingface``.
+
+Override either choice with ``HF_HOME``/``HF_HUB_CACHE`` in your
+environment. Override the model with ``GRANITE_MODEL_ID``. Both are
+honoured by the rest of the pipeline through ``src/backend/config.py``.
+
+Usage::
 
     python scripts/download_granite.py
+    HF_HOME=/data/hf python scripts/download_granite.py
+    GRANITE_MODEL_ID=ibm-granite/granite-3.1-8b-instruct python scripts/download_granite.py
 """
 
 from __future__ import annotations
 
 import os
 import sys
+from pathlib import Path
 
-TARGET = r"D:\huggingface"
-HUB = TARGET
-XET = os.path.join(TARGET, "xet")
-TMP = os.path.join(TARGET, "tmp")
 
-for path in (HUB, XET, TMP):
-    os.makedirs(path, exist_ok=True)
+def _default_cache_dir() -> Path:
+    explicit = os.environ.get("HF_HUB_CACHE") or os.environ.get("HF_HOME")
+    if explicit:
+        return Path(explicit)
+    if sys.platform == "win32":
+        d_drive = Path("D:/")
+        if d_drive.exists():
+            return d_drive / "huggingface"
+    return Path.home() / ".cache" / "huggingface"
 
-os.environ["HF_HOME"] = TARGET
-os.environ["HF_HUB_CACHE"] = HUB
-os.environ["HF_XET_CACHE"] = XET
-os.environ["HF_XET_CACHE_DIR"] = XET
-os.environ["HUGGINGFACE_HUB_CACHE"] = HUB
-os.environ["TMPDIR"] = TMP
-os.environ["TEMP"] = TMP
-os.environ["TMP"] = TMP
 
-from huggingface_hub import snapshot_download
+def main() -> None:
+    target = _default_cache_dir()
+    target.mkdir(parents=True, exist_ok=True)
+    xet = target / "xet"
+    tmp = target / "tmp"
+    xet.mkdir(parents=True, exist_ok=True)
+    tmp.mkdir(parents=True, exist_ok=True)
 
-print(f"target: {TARGET}", flush=True)
-print(f"HF_HUB_CACHE={os.environ['HF_HUB_CACHE']}", flush=True)
-print(f"TMPDIR={os.environ['TMPDIR']}", flush=True)
+    target_str = str(target)
+    os.environ["HF_HOME"] = target_str
+    os.environ["HF_HUB_CACHE"] = target_str
+    os.environ["HUGGINGFACE_HUB_CACHE"] = target_str
+    os.environ["HF_XET_CACHE"] = str(xet)
+    os.environ["HF_XET_CACHE_DIR"] = str(xet)
+    os.environ["TMPDIR"] = str(tmp)
+    os.environ["TEMP"] = str(tmp)
+    os.environ["TMP"] = str(tmp)
 
-model_id = os.environ.get("GRANITE_MODEL_ID", "ibm-granite/granite-3.0-2b-instruct")
-print(f"model: {model_id}", flush=True)
-path = snapshot_download(model_id, cache_dir=HUB)
-print(f"DONE -> {path}", flush=True)
+    from huggingface_hub import snapshot_download
+
+    model_id = os.environ.get(
+        "GRANITE_MODEL_ID", "ibm-granite/granite-3.0-2b-instruct"
+    )
+
+    print(f"target: {target_str}", flush=True)
+    print(f"model:  {model_id}", flush=True)
+
+    path = snapshot_download(model_id, cache_dir=target_str)
+    print(f"DONE -> {path}", flush=True)
+
+
+if __name__ == "__main__":
+    main()

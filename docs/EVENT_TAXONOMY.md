@@ -160,25 +160,25 @@ Example payload:
 ```
 
 ### anomaly-events
-Reserved for the Predictive Failure Engine that lands in Phase 4. Carries an anomaly type, a confidence number, and a short reason string.
+Live in v0.3.0. Produced by the Predictive Failure Engine in `src/backend/prediction/failure_engine.py` for every cognitive evaluation. Carries the source persona, the source confidence band, and six probability projections across the `5s`, `1lap`, `3laps`, and `full_race` horizons.
 
-### stress-events
-Threshold breach broadcasts pulled out of the cognitive stream. Used by the dashboard for amber and red alerts and by the audit log for post race review.
+### cognitive-prescriptions
+Live in v0.3.0. Produced by the Prescription worker in `src/backend/prescription/worker.py` for every cognitive evaluation. Carries the cognitive efficiency score, the lap delta on the table, the primary action with its triggers and projected post action twin, ranked alternatives, and any guardrail blocked actions.
 
-### overtake-events
-Driver action level events that need to be correlated with cognitive state. Useful for the Ghost Lap analysis later.
+### explanation-events
+Live in v0.3.0. Produced by the Explainability worker in `src/backend/reasoning/explainability_worker.py` for every cognitive evaluation. Carries a short Granite paragraph, the model source, and the ontology passages that grounded it.
 
 ### emotional-events
 Emotional state transitions. We keep these separate from the cognitive scores because state transitions are discrete and easier to query when they live in their own topic.
 
-### weather-events
-Track surface and weather conditions. We seed these from the FastF1 weather frames during playback so the cognitive engine can factor in rain and ambient temperature.
+### stress-events, overtake-events, weather-events
+Reserved. Bootstrapped on cluster init so producers and consumers in future phases can attach without a schema migration. No producer or consumer is wired in v0.3.0.
 
 ### strategy-events
-Reserved for the Strategy Parliament agents. Carries proposals, votes, and the final consensus that Granite synthesises.
+Reserved for the Strategy Parliament agents. Carries proposals, votes, and the final consensus that Granite synthesises. No producer in v0.3.0.
 
 ### simulation-events
-Reserved for the Counterfactual Simulation Engine. Carries scenario inputs and outputs so they can be replayed later from the audit log.
+Reserved for the offline Counterfactual Simulation Engine. The live What If Replay path runs over the audit log and does not publish here. No producer in v0.3.0.
 
 ## Partition strategy
 
