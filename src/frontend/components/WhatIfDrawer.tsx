@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { History, Loader2, Play, Plus, RefreshCw, X } from "lucide-react";
 import {
   Area,
@@ -85,11 +86,16 @@ function coerceValue(raw: string): unknown {
 
 export function WhatIfDrawer({ driverId }: Props) {
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [windowSeconds, setWindowSeconds] = useState(20);
   const [mutations, setMutations] = useState<Mutation[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [response, setResponse] = useState<WhatIfReplayResponse | null>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const addPreset = (preset: Mutation) => {
     if (mutations.some((m) => m.target === preset.target)) return;
@@ -145,8 +151,8 @@ export function WhatIfDrawer({ driverId }: Props) {
         What-If replay
       </button>
 
-      {open && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+      {open && mounted && createPortal(
+        <div className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="glass-panel rounded-[4px] max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center px-5 py-4 border-b border-white/5 sticky top-0 bg-[#131313]/80 backdrop-blur-lg z-10">
               <div>
@@ -377,7 +383,8 @@ export function WhatIfDrawer({ driverId }: Props) {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </>
   );

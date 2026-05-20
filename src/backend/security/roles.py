@@ -46,6 +46,7 @@ _ROLES: Dict[str, Role] = {
             "write:counterfactual",
             "read:prescription",
             "write:prescription_preview",
+            "read:ghost_lap",
             "read:whatif",
             "write:whatif",
         },

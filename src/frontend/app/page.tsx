@@ -355,10 +355,18 @@ export default function MissionControl() {
   const persona = latest?.persona_state ?? "Awaiting telemetry";
   const band = latest?.confidence_band ?? null;
   const bandView = useMemo(() => bandStyle(band), [band]);
-  const driverScopedExplanations = useMemo(
-    () => (selectedDriver ? explanations.filter((e) => e.driver_id === selectedDriver) : explanations),
-    [explanations, selectedDriver]
-  );
+  // Show explanations for the selected driver first, then fill the
+  // panel with the most recent explanations from any other driver so
+  // the surface never reads 'Awaiting first reasoning event' while a
+  // Granite paragraph is sitting in the audit log under a different
+  // driver id.
+  const driverScopedExplanations = useMemo(() => {
+    if (!selectedDriver) return explanations;
+    const scoped = explanations.filter((e) => e.driver_id === selectedDriver);
+    if (scoped.length >= 4) return scoped;
+    const others = explanations.filter((e) => e.driver_id !== selectedDriver);
+    return [...scoped, ...others].slice(0, 8);
+  }, [explanations, selectedDriver]);
 
   return (
     <>
