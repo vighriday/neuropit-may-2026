@@ -16,7 +16,6 @@ import time
 from datetime import datetime, timezone
 from typing import Dict, List
 
-import fastf1
 import numpy as np
 import pandas as pd
 
@@ -29,7 +28,19 @@ logger = logging.getLogger(__name__)
 
 CACHE_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "..", "fastf1_cache")
 os.makedirs(CACHE_DIR, exist_ok=True)
-fastf1.Cache.enable_cache(CACHE_DIR)
+
+
+def _enable_fastf1_cache() -> "object":
+    """Import fastf1 lazily and wire the on disk cache.
+
+    Keeping the import inside the function lets unit tests import the
+    streamer module without needing fastf1 installed. Production paths
+    (load_data, main) still call this helper before touching FastF1.
+    """
+    import fastf1  # noqa: WPS433 (intentional lazy import)
+
+    fastf1.Cache.enable_cache(CACHE_DIR)
+    return fastf1
 
 
 class HistoricalRaceStreamer:
@@ -54,6 +65,7 @@ class HistoricalRaceStreamer:
 
     def load_data(self) -> None:
         logger.info("Loading session %s %s %s", self.year, self.event, self.session_name)
+        fastf1 = _enable_fastf1_cache()
         self.race_session = fastf1.get_session(self.year, self.event, self.session_name)
         self.race_session.load()
 
