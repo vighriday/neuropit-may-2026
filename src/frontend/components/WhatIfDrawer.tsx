@@ -139,7 +139,7 @@ export function WhatIfDrawer({ driverId }: Props) {
         type="button"
         onClick={() => setOpen(true)}
         disabled={!driverId}
-        className="flex items-center gap-2 px-3 py-2 rounded border border-blue-700/40 bg-blue-900/20 text-blue-200 text-[11px] tracking-[0.3em] uppercase hover:bg-blue-900/40 disabled:opacity-40 disabled:cursor-not-allowed"
+        className="flex items-center gap-2 px-3 py-2 rounded-[4px] border border-apex-cyan/30 bg-apex-cyan/10 text-apex-cyan text-[11px] font-mono tracking-[0.3em] uppercase hover:bg-apex-cyan/20 hover:apex-glow-cyan disabled:opacity-40 disabled:cursor-not-allowed transition-all"
       >
         <History size={14} />
         What-If replay
@@ -147,10 +147,10 @@ export function WhatIfDrawer({ driverId }: Props) {
 
       {open && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-neuropit-dark border border-gray-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center px-5 py-4 border-b border-gray-800 sticky top-0 bg-neuropit-dark z-10">
+          <div className="glass-panel rounded-[4px] max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center px-5 py-4 border-b border-white/5 sticky top-0 bg-[#131313]/80 backdrop-blur-lg z-10">
               <div>
-                <h2 className="text-sm tracking-[0.3em] uppercase text-blue-300 flex items-center gap-2">
+                <h2 className="text-sm font-display tracking-[0.3em] uppercase text-apex-cyan flex items-center gap-2">
                   <History size={14} />
                   What-If replay
                 </h2>

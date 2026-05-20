@@ -5,6 +5,9 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+  ),
   title: "NeuroPit Cognitive Twin OS",
   description:
     "Real time Cognitive Twin Operating System for motorsport. Telemetry is infrastructure. Cognition is the product. Built by Hriday Vig for the IBM AI Builders Challenge 2026 powered by IBM SkillsBuild.",

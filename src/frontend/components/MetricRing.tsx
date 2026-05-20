@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { motion } from "framer-motion";
 
 type MetricRingProps = {
   label: string;
@@ -32,13 +33,13 @@ export function MetricRing({
   const cautious = inverted ? clamped < 60 : clamped > 50;
 
   const ringColor = dangerous
-    ? "stroke-red-500"
+    ? "stroke-apex-red"
     : cautious
-    ? "stroke-amber-400"
-    : "stroke-emerald-400";
+    ? "stroke-apex-amber"
+    : "stroke-apex-cyan";
 
   return (
-    <div className="flex flex-col items-center justify-center">
+    <div className="flex flex-col items-center justify-center relative">
       <svg width={size} height={size} className="-rotate-90">
         <circle
           cx={center}
@@ -46,9 +47,9 @@ export function MetricRing({
           r={radius}
           fill="none"
           strokeWidth={stroke}
-          className="stroke-gray-800"
+          className="stroke-white/10"
         />
-        <circle
+        <motion.circle
           cx={center}
           cy={center}
           r={radius}
@@ -56,17 +57,24 @@ export function MetricRing({
           strokeWidth={stroke}
           strokeLinecap="round"
           strokeDasharray={circumference}
-          strokeDashoffset={dashOffset}
-          className={`${ringColor} transition-all duration-300`}
+          animate={{ strokeDashoffset: dashOffset }}
+          transition={{ duration: 0.8, type: "spring", bounce: 0.2 }}
+          className={`${ringColor}`}
+          style={{ filter: "drop-shadow(0 0 6px currentColor)" }}
         />
       </svg>
-      <div className="-mt-[88px] flex flex-col items-center pointer-events-none">
-        <div className={`text-4xl font-black tracking-tighter ${accent}`}>
+      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none pb-4">
+        <motion.div
+          key={clamped}
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className={`text-4xl font-mono font-bold tracking-tighter ${accent} drop-shadow-lg`}
+        >
           {clamped.toFixed(1)}
-        </div>
-        <div className="text-[10px] tracking-[0.25em] uppercase text-gray-500">{label}</div>
+        </motion.div>
+        <div className="text-[10px] tracking-[0.25em] uppercase text-gray-400 mt-1">{label}</div>
       </div>
-      <div className="mt-12 text-[10px] tracking-[0.25em] uppercase text-gray-600">/ {max}</div>
+      <div className="absolute bottom-0 text-[10px] tracking-[0.25em] uppercase text-gray-600 mb-2">/ {max}</div>
     </div>
   );
 }

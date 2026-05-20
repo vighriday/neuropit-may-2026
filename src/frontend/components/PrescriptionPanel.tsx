@@ -59,15 +59,15 @@ const SURFACE_ICONS: Record<string, React.ReactNode> = {
 };
 
 function efficiencyTone(value: number): string {
-  if (value >= 75) return "text-emerald-300";
-  if (value >= 50) return "text-amber-300";
-  return "text-red-300";
+  if (value >= 75) return "text-apex-cyan";
+  if (value >= 50) return "text-apex-amber";
+  return "text-apex-red";
 }
 
 function efficiencyBar(value: number): string {
-  if (value >= 75) return "bg-emerald-500";
-  if (value >= 50) return "bg-amber-400";
-  return "bg-red-500";
+  if (value >= 75) return "bg-apex-cyan";
+  if (value >= 50) return "bg-apex-amber";
+  return "bg-apex-red";
 }
 
 export function PrescriptionPanel({ prescription, driverId }: Props) {
@@ -80,7 +80,7 @@ export function PrescriptionPanel({ prescription, driverId }: Props) {
 
   if (!prescription || !driverId) {
     return (
-      <div className="bg-neuropit-dark border border-gray-800 rounded p-5">
+      <div className="glass-panel rounded-[4px] p-5">
         <h2 className="text-[11px] tracking-[0.3em] uppercase text-gray-400 mb-3 flex items-center gap-2">
           <Target size={14} className="text-emerald-300" />
           Prescriptive engine
@@ -96,7 +96,7 @@ export function PrescriptionPanel({ prescription, driverId }: Props) {
   const lost = prescription.optimality.performance_lost_s;
 
   return (
-    <div className="bg-neuropit-dark border border-gray-800 rounded p-5">
+    <div className="glass-panel rounded-[4px] p-5">
       <div className="flex justify-between items-start mb-3">
         <h2 className="text-[11px] tracking-[0.3em] uppercase text-gray-400 flex items-center gap-2">
           <Target size={14} className="text-emerald-300" />
@@ -109,12 +109,12 @@ export function PrescriptionPanel({ prescription, driverId }: Props) {
 
       <div className="grid grid-cols-2 gap-3 mb-4">
         <div className="border border-gray-800 rounded px-3 py-2">
-          <div className="text-[9px] tracking-[0.3em] uppercase text-gray-500 mb-1">
+          <div className="text-[9px] font-sans tracking-[0.3em] uppercase text-gray-500 mb-1">
             Cognitive efficiency
           </div>
-          <div className={`text-2xl font-black tracking-tight ${efficiencyTone(eff)}`}>
+          <div className={`text-2xl font-mono font-black tracking-tight ${efficiencyTone(eff)}`}>
             {eff.toFixed(0)}
-            <span className="text-[10px] text-gray-600 ml-1">/ 100</span>
+            <span className="text-[10px] font-sans text-gray-600 ml-1">/ 100</span>
           </div>
           <div className="mt-2 h-1.5 bg-gray-800 rounded overflow-hidden">
             <div
@@ -178,10 +178,10 @@ export function PrescriptionPanel({ prescription, driverId }: Props) {
       </div>
 
       <div className="mb-3">
-        <div className="text-[9px] tracking-[0.3em] uppercase text-gray-500 mb-1">
+        <div className="text-[9px] font-sans tracking-[0.3em] uppercase text-gray-500 mb-1">
           Rationale
         </div>
-        <p className="text-xs text-gray-200 leading-relaxed border-l-2 border-emerald-700/40 pl-3 py-1">
+        <p className="text-xs font-sans text-gray-200 leading-relaxed border-l-2 border-apex-cyan/40 pl-3 py-1">
           {prescription.rationale}
         </p>
         {prescription.granite?.text && (

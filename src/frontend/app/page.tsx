@@ -7,16 +7,13 @@ import {
   AreaChart,
   CartesianGrid,
   Line,
-  LineChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
 import {
-  Activity,
   AlertTriangle,
-  Brain,
   Eye,
   Gauge,
   ShieldCheck,
@@ -32,6 +29,8 @@ import { PersonaTick, PersonaTimeline } from "../components/PersonaTimeline";
 import { PrescriptionPanel, type PrescriptionPayload } from "../components/PrescriptionPanel";
 import { WhatIfDrawer } from "../components/WhatIfDrawer";
 import { ensureDashboardToken } from "../lib/api";
+import { LandingJourney } from "../components/LandingJourney";
+import { motion } from "framer-motion";
 
 type CognitiveSnapshot = {
   driver_id: string;
@@ -336,17 +335,25 @@ export default function MissionControl() {
   const persona = latest?.persona_state ?? "Awaiting telemetry";
   const band = latest?.confidence_band ?? null;
   const bandView = useMemo(() => bandStyle(band), [band]);
-  const hasLatest = latest !== null;
   const driverScopedExplanations = useMemo(
     () => (selectedDriver ? explanations.filter((e) => e.driver_id === selectedDriver) : explanations),
     [explanations, selectedDriver]
   );
 
   return (
-    <main className="min-h-screen p-6 md:p-8">
-      <Nav />
+    <>
+      <LandingJourney />
 
-      <div className="flex flex-col gap-3 md:flex-row md:justify-between md:items-center mb-6 border-b border-gray-800 pb-5">
+      <motion.main 
+        initial={{ opacity: 0, y: 100 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 1 }}
+        className="min-h-screen p-6 md:p-8 max-w-[1400px] mx-auto relative z-10 glass-panel rounded-t-2xl shadow-[0_-20px_50px_rgba(0,0,0,0.5)] -mt-[10vh]"
+      >
+        <Nav />
+
+        <div className="flex flex-col gap-3 md:flex-row md:justify-between md:items-center mb-6 border-b border-gray-500/30 pb-5 mt-6">
         <div className="flex items-center gap-4">
           <Image
             src="/neuropit-logo.png"
@@ -426,18 +433,18 @@ export default function MissionControl() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
-        <div className="bg-neuropit-dark border border-gray-800 rounded p-5 flex flex-col items-center">
-          <MetricRing label="Stress" value={stress} accent="text-red-300" />
-        </div>
-        <div className="bg-neuropit-dark border border-gray-800 rounded p-5 flex flex-col items-center">
-          <MetricRing label="Confidence" value={confidence} accent="text-blue-300" inverted />
-        </div>
-        <div className="bg-neuropit-dark border border-gray-800 rounded p-5 flex flex-col items-center">
-          <MetricRing label="Fatigue" value={fatigue} accent="text-amber-300" />
-        </div>
-        <div className="bg-neuropit-dark border border-gray-800 rounded p-5 flex flex-col items-center">
-          <MetricRing label="Panic Prob" value={panicProb} accent="text-orange-300" />
-        </div>
+        <motion.div whileHover={{ scale: 1.02 }} className="glass-panel rounded-[4px] p-5 flex flex-col items-center">
+          <MetricRing label="Stress" value={stress} accent="text-apex-red" />
+        </motion.div>
+        <motion.div whileHover={{ scale: 1.02 }} className="glass-panel rounded-[4px] p-5 flex flex-col items-center">
+          <MetricRing label="Confidence" value={confidence} accent="text-apex-cyan" inverted />
+        </motion.div>
+        <motion.div whileHover={{ scale: 1.02 }} className="glass-panel rounded-[4px] p-5 flex flex-col items-center">
+          <MetricRing label="Fatigue" value={fatigue} accent="text-apex-amber" />
+        </motion.div>
+        <motion.div whileHover={{ scale: 1.02 }} className="glass-panel rounded-[4px] p-5 flex flex-col items-center">
+          <MetricRing label="Panic Prob" value={panicProb} accent="text-apex-red" />
+        </motion.div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
@@ -452,7 +459,7 @@ export default function MissionControl() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-        <div className="lg:col-span-3 bg-neuropit-dark border border-gray-800 rounded p-5">
+        <div className="lg:col-span-3 glass-panel border border-white/10 rounded-xl p-5 shadow-lg">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-[11px] tracking-[0.3em] uppercase text-gray-400">
               Real time cognitive trajectory
@@ -497,7 +504,7 @@ export default function MissionControl() {
           </div>
         </div>
 
-        <div className="bg-neuropit-dark border border-gray-800 rounded p-5 flex flex-col">
+        <div className="glass-panel border border-white/10 rounded-xl p-5 flex flex-col shadow-lg">
           <h2 className="text-[11px] tracking-[0.3em] uppercase text-gray-400 mb-3 flex items-center gap-2">
             <Sparkles size={14} className="text-purple-300" />
             IBM Granite explainability
@@ -567,7 +574,8 @@ export default function MissionControl() {
       </div>
 
       <Footer />
-    </main>
+      </motion.main>
+    </>
   );
 }
 
@@ -583,12 +591,12 @@ function SecondaryTile({
   accent: string;
 }) {
   return (
-    <div className="bg-neuropit-dark border border-gray-800 rounded px-4 py-3">
+    <div className="glass-panel rounded-[4px] px-4 py-3 transition-transform hover:-translate-y-0.5">
       <div className="flex justify-between items-center mb-1">
-        <span className="text-[10px] tracking-[0.3em] uppercase text-gray-500">{label}</span>
+        <span className="text-[10px] font-sans tracking-[0.3em] uppercase text-gray-500">{label}</span>
         {icon}
       </div>
-      <div className={`text-2xl font-black tracking-tight ${accent}`}>
+      <div className={`text-2xl font-mono font-bold tracking-tight ${accent}`}>
         {value.toFixed(1)}
         <span className="text-[10px] text-gray-600 ml-1">/ 100</span>
       </div>

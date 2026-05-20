@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Narrow:ital,wght@0,400..700;1,400..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -6,10 +8,39 @@
   color-scheme: dark;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  background: radial-gradient(circle at 50% -200px, #14181f 0%, #050505 70%);
+  background-color: #050505;
   color: #f5f5f5;
   min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Glassmorphism panel base (Apex Velocity style) */
+.glass-panel {
+  @apply bg-[#131313]/40 backdrop-blur-[20px] rounded-[4px] border border-white/5 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.1)];
+}
+
+.apex-glow-red {
+  box-shadow: 0 0 5px rgba(255, 24, 1, 0.5);
+}
+
+.apex-glow-cyan {
+  box-shadow: 0 0 5px rgba(0, 240, 255, 0.5);
 }
 
 ::-webkit-scrollbar {
