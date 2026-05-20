@@ -33,6 +33,9 @@
 
 The pit wall has measured the car in extraordinary detail for forty years. It has measured almost nothing about the human nervous system operating the car. NeuroPit closes that gap with a real-time **Cognitive Twin** — a nine-score psychological state vector inferred from the same telemetry the team is already collecting, grounded in **IBM Granite** explainable reasoning over an **IBM Docling** motorsport cognition ontology, orchestrated through **Langflow**, and surfaced on a Mission Control pit wall that a strategist can defend in a stewards' meeting.
 
+![NeuroPit Mission Control](docs/assets/screenshots/MissionControl2.png)
+*Mission Control surface during a live replay of Abu Dhabi 2021. Cognitive rings, driver chips, and the live telemetry / heartbeat indicators sit above the secondary scores. Every value is computed by the deterministic cognitive engine in `src/backend/inference/cognitive_engine.py`.*
+
 ---
 
 ## Why this exists
@@ -89,6 +92,9 @@ Every evaluation tick produces:
 ```
 
 Every emission ships with a confidence band (`high` / `moderate` / `unstable`), a written explanation from IBM Granite grounded in real motorsport literature, and an immutable audit log entry. The surface never displays a number without its explanation. That is a hard rule.
+
+![Trajectory, emotional distribution, 5s failure forecast](docs/assets/screenshots/MissionControl4.png)
+*Real-time cognitive trajectory (stress, confidence, fatigue, panic), live emotional distribution across nine emotions, and a five-second failure forecast (crash / lock-up / spin / failed overtake / concentration collapse / strategic noncompliance) all rendered from live Kafka events.*
 
 ---
 
@@ -265,14 +271,35 @@ If any step fails, the troubleshooting checklist lives under the FAQ at the bott
 
 ## Demo path
 
-The Judge Quickstart above takes you to a live Mission Control. Once the stream is running, the dashboard tells its own story in four panels:
+The Judge Quickstart above takes you to a live Mission Control. Once the stream is running, the dashboard tells its own story in four panels.
 
-1. **Cognitive Twin** populates in under ten seconds (rings + persona + trajectory chart).
-2. **Granite reasoning panel** renders one paragraph per driver, labelled `via granite-local`.
-3. **Prescriptive Engine panel** shows the cognitive efficiency score, the seconds left on the table this lap, and the prescribed pit-wall action with projected counterfactual twin.
-4. **What-If drawer** (top right button) mutates a real audit row and re-runs the cognitive maths, side by side.
+### 1. Cognitive Twin populates
+
+![Mission Control landing](docs/assets/screenshots/MissionControl1.png)
+*The scroll narrative introduces NeuroPit before the live pit wall comes into view. The full Mission Control surface appears once you scroll past the third scene.*
+
+### 2. Prescriptive Engine
+
+![Prescriptive Engine panel](docs/assets/screenshots/MissionControl3.png)
+*The Prescriptive Engine emits a cognitive efficiency score, the seconds on the table this lap, the prescribed pit-wall action (with the triggers that fired), the projected post-action twin, and a ranked list of alternatives. Guardrail-blocked actions sink to the bottom of the list.*
+
+### 3. What-If Replay
+
+![What-If drawer](docs/assets/screenshots/WhatIfReplay.png)
+*The What-If drawer mutates a real audit row and re-runs the cognitive maths deterministically. Here, dropping the driver's heart rate to 110 bpm and trimming steering instability collapses stress by 72 points.*
+
+### 4. IBM Granite explainability
+
+![Explainability page](docs/assets/screenshots/Explainability.png)
+*Every cognitive evaluation gets a short paragraph from Granite 3.0 2B Instruct, grounded in passages retrieved from the IBM Docling compiled motorsport ontology. Each paragraph carries its `via granite-local` source label.*
 
 A minute-by-minute run order judges or recruiters can follow without you in the room lives in [`docs/DEMO.md`](docs/DEMO.md).
+
+### Diagnostic side panels
+
+| Ghost Lap (cognitive lost time) | Counterfactual scenarios |
+| --- | --- |
+| ![Ghost Lap](docs/assets/screenshots/GhostLap.png) | ![Counterfactual](docs/assets/screenshots/Counterfactual.png) |
 
 ---
 
@@ -292,6 +319,23 @@ A minute-by-minute run order judges or recruiters can follow without you in the 
 | Telemetry source | OpenF1 + FastF1 |
 | Tests | pytest, 153 unit tests, integration tests gated on infra |
 | CI | GitHub Actions on every push and pull request |
+
+### Live proof of every tier
+
+| FastAPI Swagger | Redpanda Kafka topics |
+| --- | --- |
+| ![Swagger docs](docs/assets/screenshots/Swaggerdocs.png) | ![Redpanda Console](docs/assets/screenshots/Redpanda.png) |
+| Every protected REST route, OpenAPI 3.1 schemas, JWT-aware. | Live `cognitive-state-inference` topic with 318k+ messages during a session replay. |
+
+| Qdrant motorsport ontology | InfluxDB time-series cognitive scores |
+| --- | --- |
+| ![Qdrant](docs/assets/screenshots/Qdrant.png) | ![InfluxDB Data Explorer](docs/assets/screenshots/InfluxDBDataExplorer.png) |
+| Real `sentence-transformers/all-mpnet-base-v2` embeddings of the IBM Docling compiled methodology seed. | Cognitive engine writes per-driver scores to `neuropit-telemetry` for replay and post-race analysis. |
+
+### Backend tier layout
+
+![src/backend tier layout](docs/assets/screenshots/VSCoderepotree.png)
+*Six runtime tiers in `src/backend/`: `inference` (Cognitive Twin), `prescription` (Prescriptive Engine), `whatif` (audit-log replay), `reasoning` (Granite + Docling + Langflow), `prediction` (Predictive Failure Engine), and `security` (JWT + RBAC + Fernet).*
 
 ---
 
