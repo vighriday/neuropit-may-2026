@@ -7,9 +7,6 @@ when the disk write fails so the caller can drop the matching emit.
 
 from __future__ import annotations
 
-import os
-import tempfile
-
 import pytest
 
 from src.backend.common import audit
@@ -27,16 +24,37 @@ def test_append_writes_a_line(tmp_path, monkeypatch: pytest.MonkeyPatch) -> None
     assert '"value": 1' in contents[0]
 
 
-def test_append_raises_when_directory_unwritable(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setenv("AUDIT_LOG_DIR", "Z:\\definitely\\not\\writable\\neuropit-audit-test")
+def test_append_raises_when_open_fails(tmp_path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """OS-agnostic write failure: monkeypatch the open builtin to raise."""
+    monkeypatch.setenv("AUDIT_LOG_DIR", str(tmp_path))
     get_settings.cache_clear()
+
+    real_open = open
+
+    def _boom(file, *args, **kwargs):
+        # Only blow up when the audit module tries to write, so pytest's
+        # own internal open calls still work.
+        if str(file).endswith(".jsonl"):
+            raise PermissionError("simulated read only filesystem")
+        return real_open(file, *args, **kwargs)
+
+    monkeypatch.setattr("builtins.open", _boom)
     with pytest.raises(Exception):
         audit.append({"kind": "test", "value": 2})
 
 
-def test_try_append_swallows_failures(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setenv("AUDIT_LOG_DIR", "Z:\\definitely\\not\\writable\\neuropit-audit-test")
+def test_try_append_swallows_failures(tmp_path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("AUDIT_LOG_DIR", str(tmp_path))
     get_settings.cache_clear()
+
+    real_open = open
+
+    def _boom(file, *args, **kwargs):
+        if str(file).endswith(".jsonl"):
+            raise PermissionError("simulated read only filesystem")
+        return real_open(file, *args, **kwargs)
+
+    monkeypatch.setattr("builtins.open", _boom)
     assert audit.try_append({"kind": "test", "value": 3}) is False
 
 
