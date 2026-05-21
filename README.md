@@ -24,8 +24,6 @@
 
 **Built solo by [Hriday Vig](https://github.com/vighriday) · IBM AI Builders Challenge 2026 · Racing Innovation Challenge · powered by IBM SkillsBuild**
 
-
-
 </div>
 
 ---
@@ -40,7 +38,9 @@ The pit wall has measured the car in extraordinary detail for forty years. It ha
 
 ---
 
-## Why this exists
+## The issue
+
+![The issue — F1 measures everything except what matters most](docs/assets/IssueImage.png)
 
 A driver who has just survived a wet braking incident at three hundred kilometres per hour does not return to a neutral mental state on the next straight. Their steering becomes microscopically less stable. Their throttle commitment drops. Their heart rate variability tightens.
 
@@ -65,6 +65,14 @@ The category is **Human Machine Cognitive Intelligence for Motorsport**. The uni
 - ❌ Not a strategy copilot.
 - ❌ Not a generic AI racing assistant.
 - ✅ A Cognitive Twin Operating System with an audit trail.
+
+---
+
+## The solution
+
+![NeuroPit — the first real time Cognitive Twin Operating System for Formula 1](docs/assets/MagicSolution.png)
+
+NeuroPit reads the same telemetry the team is already collecting and emits a nine score psychological state vector per driver every fifth of a second. Every score is computed by a deterministic physics first engine and explained by IBM Granite 3.0 Instruct grounded in passages compiled by IBM Docling. The Prescriptive Engine turns each evaluation into a typed pit wall action with the triggers that fired, the projected post action twin, ranked alternatives, and clearly tagged actions the system refuses to recommend. The What If Replay engine lets a strategist re run any past moment under a different driver state and watch the cognitive trajectory diverge. Every decision is recorded before it is broadcast.
 
 ---
 
