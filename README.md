@@ -24,6 +24,8 @@
 
 **Built solo by [Hriday Vig](https://github.com/vighriday) · IBM AI Builders Challenge 2026 · Racing Innovation Challenge · powered by IBM SkillsBuild**
 
+
+
 </div>
 
 ---
