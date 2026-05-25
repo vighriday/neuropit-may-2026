@@ -13,7 +13,7 @@
 [![IBM Granite](https://img.shields.io/badge/IBM-Granite-052FAD?logo=ibm)](https://github.com/ibm-granite-community)
 [![IBM Docling](https://img.shields.io/badge/IBM-Docling-052FAD?logo=ibm)](https://www.docling.ai)
 [![Langflow](https://img.shields.io/badge/Langflow-Orchestrated-1f7a8c)](https://www.langflow.org)
-[![Tests](https://img.shields.io/badge/tests-178%20passing-brightgreen)](tests/)
+[![Tests](https://img.shields.io/badge/tests-195%20passing-brightgreen)](tests/)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-3776AB?logo=python&logoColor=white)](https://www.python.org)
 [![Next.js 14](https://img.shields.io/badge/Next.js-14-000000?logo=nextdotjs)](https://nextjs.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
@@ -164,10 +164,11 @@ Telemetry flows in on the left. The Cognitive Twin flows out on the right. Every
 | Behavioural telemetry feature extraction | [`src/backend/feature_engineering/signal_processor.py`](src/backend/feature_engineering/signal_processor.py) |
 | Probabilistic Cognitive Inference Engine (nine-score twin) | [`src/backend/inference/cognitive_engine.py`](src/backend/inference/cognitive_engine.py) |
 | Emotional State Engine (nine-emotion distribution) | [`src/backend/inference/emotional_state.py`](src/backend/inference/emotional_state.py) |
-| Persona Drift state machine | [`src/backend/common/persona.py`](src/backend/common/persona.py) |
+| Persona Drift state machine with **per-driver priors** trained on real 2021 telemetry | [`src/backend/common/persona.py`](src/backend/common/persona.py), [`src/backend/common/priors.py`](src/backend/common/priors.py) |
 | Predictive Failure Engine across four horizons | [`src/backend/prediction/failure_engine.py`](src/backend/prediction/failure_engine.py) |
 | Ghost Lap AI (cognitive-normalised laps) | [`src/backend/simulation/ghost_lap.py`](src/backend/simulation/ghost_lap.py) |
 | Counterfactual Simulation Engine | [`src/backend/simulation/counterfactual.py`](src/backend/simulation/counterfactual.py) |
+| **Live PPG biometric ingestion** from a phone camera | [`src/backend/integration/ppg_ingest.py`](src/backend/integration/ppg_ingest.py), [`src/frontend/app/sensor/page.tsx`](src/frontend/app/sensor/page.tsx) |
 | **Cognitive Prescriptive Engine (Optimality Gap + typed actions)** | [`src/backend/prescription/engine.py`](src/backend/prescription/engine.py) |
 | **Driver Performance Envelope (per-driver fast-lap signature)** | [`src/backend/prescription/envelope.py`](src/backend/prescription/envelope.py) |
 | **Audit-log-driven What-If Replay engine** | [`src/backend/whatif/replay.py`](src/backend/whatif/replay.py) |
@@ -181,6 +182,30 @@ Telemetry flows in on the left. The Cognitive Twin flows out on the right. Every
 | JWT cognitive gateway with role-based access | [`src/backend/api/gateway.py`](src/backend/api/gateway.py) |
 | Fernet biometric encryption at the source | [`src/backend/security/crypto.py`](src/backend/security/crypto.py) |
 | Mission Control pit-wall surface | [`src/frontend/app/`](src/frontend/app/) |
+
+---
+
+## Calibrated against real data, not just heuristics
+
+NeuroPit is honest about being a rule-based system rather than a black-box model, but the rules are not arbitrary. Two artefacts shipped in this repository ground the engine against real evidence.
+
+### Per-driver persona priors
+
+The default persona thresholds (Panic, Aggressive, Defensive, Flow, Recovery, Fatigue) used to be a single population-level set applied to every driver. That is wrong: a driver who naturally operates at higher throttle and brake variability looks "stressed" on absolute thresholds even when they are inside their normal envelope, while a calmer driver looks "defensive" on the same thresholds even when pushing hard.
+
+[`scripts/compute_persona_priors.py`](scripts/compute_persona_priors.py) loads a configurable FastF1 session, extracts a stress proxy per lap per driver (throttle and brake variability, normalised mean speed), takes the median across laps, and z-scores each driver against the session median. The z-scores translate into threshold offsets in [`data/persona_priors.json`](data/persona_priors.json). The cognitive engine loads these offsets at startup so each driver gets thresholds shifted by their own operating envelope. Drivers without a prior fall back cleanly to the population default. Every cognitive event carries a `priors_active: true` field so a judge can verify the priors are live from the Kafka topic alone. The 2021 Abu Dhabi race priors that ship by default cover 19 drivers; anyone with FastF1 access can regenerate the artefact for any other session by passing `--year` and `--event`.
+
+### Live PPG biometric ingestion (phone camera)
+
+The biometric layer is no longer synthetic only. Opening [`/sensor`](src/frontend/app/sensor/page.tsx) on any phone with a rear camera turns that phone into a low-fidelity heart-rate sensor. The browser samples the red channel of the camera at thirty frames per second, detrends against ambient light drift, enforces a refractory period between accepted peaks, and emits a median-smoothed BPM once per second to the gateway over WebSocket. The gateway forwards each sample to the same `biometrics-enriched` Kafka topic the synthetic biometric source publishes to, tagged with `source: "ppg-camera"`. The cognitive engine consumes the topic identically regardless of the source, so the dashboard reacts to your actual heart rate as if it were a synthetic value.
+
+This is documented as a research demo, not a medical-grade device. PPG from a phone camera is noisy and accurate to within roughly five BPM in good conditions. Treat it as proof that the pipeline is end-to-end live, not as a clinical sensor.
+
+### Honest retrospective
+
+[`docs/FAILURE_MODES.md`](docs/FAILURE_MODES.md) lists ten real engineering decisions where the first approach was abandoned or rebuilt during the project. The entries point at specific commits or files. The intent is that anyone reading the final state of the system can see what was rejected and why, not only what shipped.
+
+---
 
 ## From diagnostic twin to prescriptive operating system
 
@@ -236,6 +261,21 @@ Open `http://localhost:3000`. Within ten seconds the cognitive trajectory starts
 
 If you are evaluating NeuroPit for the IBM AI Builders Challenge, this is the shortest possible path to seeing the Cognitive Twin emit live.
 
+**One-command path (recommended).** A single Python script brings up Docker, creates the topics, launches the backend, the gateway, the streamer, and Mission Control. It detects your LAN IP automatically so the live PPG sensor URL works on any phone on the same WiFi without editing config.
+
+```bash
+git clone https://github.com/vighriday/neuropit-may-2026.git
+cd neuropit-may-2026
+python -m pip install -r src/backend/requirements.txt
+python scripts/judge_bootstrap.py
+```
+
+The script prints the URLs to open. Within roughly thirty seconds you have a live Cognitive Twin on Mission Control, the Granite reasoning panel filling in paragraphs, and the live PPG sensor page ready for any phone on the same network.
+
+To shut everything down: `python scripts/judge_bootstrap.py --down`.
+
+**Manual path (multi-terminal).** If you prefer to run each piece by hand and watch its logs:
+
 ```bash
 # 1. one-line setup (Python 3.11+, Node 20+, Docker required)
 git clone https://github.com/vighriday/neuropit-may-2026.git && cd neuropit-may-2026 && cp .env.example .env && make install && make infra-up && make bootstrap
@@ -268,7 +308,9 @@ cd src/frontend && npm install && npm run dev
 2. **Reasoning panel** — confirm every paragraph is labelled `via granite-local` and cites motorsport ontology passages.
 3. **Live channels** — open `ws://localhost:8000/ws/cognitive` (any WebSocket client) for the live fan-out of cognitive, emotional, anomaly, explanation, and prescription events.
 4. **Audit log** — open any file under `audit_logs/cognitive-*.jsonl`. Every event carries its score inputs, the weights used, the model source, and (for explanation rows) the Granite reasoning paragraph.
-5. **Methodology** — every weight is documented in [`docs/COGNITIVE_METHODOLOGY.md`](docs/COGNITIVE_METHODOLOGY.md).
+5. **Per-driver priors active** — every cognitive event on the `cognitive-state-inference` topic carries `priors_active: true`. The weights snapshot in the audit log also records which historical session the priors were calibrated against.
+6. **Live PPG biometrics from a phone** — open `http://<your-laptop-LAN-IP>:3000/sensor` on a phone on the same WiFi (the bootstrap script prints the URL). Allow the camera, hold a finger gently over the rear lens, and watch the cognitive twin react to your real heart rate as `source: "ppg-camera"` events land on the `biometrics-enriched` topic alongside the synthetic stream.
+7. **Methodology** — every weight is documented in [`docs/COGNITIVE_METHODOLOGY.md`](docs/COGNITIVE_METHODOLOGY.md), and the engineering retrospective lives in [`docs/FAILURE_MODES.md`](docs/FAILURE_MODES.md).
 
 If any step fails, the troubleshooting checklist lives under the FAQ at the bottom of this README.
 
@@ -282,7 +324,7 @@ If any step fails, the troubleshooting checklist lives under the FAQ at the bott
 | **IBM Docling usage** | [`src/backend/knowledge/docling_compiler.py`](src/backend/knowledge/docling_compiler.py) — compiles FIA reports, neuroscience papers, and racing literature into a Qdrant collection. Retrieved at every Granite call. |
 | **Langflow usage** | [`orchestration/langflow/neuropit_strategy_flow.json`](orchestration/langflow/neuropit_strategy_flow.json) — importable visual flow. |
 | **Innovation** | Three-tier system: diagnostic Cognitive Twin, prescriptive engine with typed action space and Optimality Gap against a per-driver Performance Envelope, audit-log-driven What-If Replay that lets the strategist re-run real session data under a mutated input. Nobody else ships this stack. |
-| **Technical depth** | Event-driven Redpanda pipeline, InfluxDB time-series persistence, Qdrant vector grounding, FastAPI WebSocket fan-out, JWT + RBAC, Fernet encryption at source, 178 unit tests, GitHub Actions CI. |
+| **Technical depth** | Event-driven Redpanda pipeline, InfluxDB time-series persistence, Qdrant vector grounding, FastAPI WebSocket fan-out, JWT + RBAC, Fernet encryption at source, 195 unit tests, GitHub Actions CI. |
 | **Explainability** | Every output ships with a Granite paragraph, a confidence band, and a JSONL audit row. Physics-first reasoning forbids Granite from inventing cognitive numbers. |
 | **Impact** | Closes the seven-figure gap between telemetry analytics and driver state. Generalises to aviation, defence, surgery, esports, and elite athletics. |
 | **Demo readiness** | One `make` command per terminal. Mission Control pit-wall shows the Cognitive Twin emitting within ten seconds of stream start. |
@@ -338,7 +380,7 @@ A minute-by-minute run order judges or recruiters can follow without you in the 
 | Knowledge | IBM Docling |
 | Orchestration | Langflow reference flow |
 | Telemetry source | OpenF1 + FastF1 |
-| Tests | pytest, 178 unit tests, integration tests gated on infra |
+| Tests | pytest, 195 unit tests, integration tests gated on infra |
 | CI | GitHub Actions on every push and pull request |
 
 ### Live proof of every tier
@@ -377,7 +419,7 @@ Vulnerability disclosure procedure lives in [`SECURITY.md`](SECURITY.md).
 ## Tests
 
 ```bash
-make test              # 178 unit tests, no infrastructure required
+make test              # 195 unit tests, no infrastructure required
 make integration       # integration smoke tests, requires Redpanda running
 ```
 

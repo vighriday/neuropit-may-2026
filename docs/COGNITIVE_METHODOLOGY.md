@@ -94,6 +94,81 @@ Decision rules, evaluated in order. The first rule that matches wins.
 
 Reasoning. We start with the highest stakes label, Panic, so the strategist sees the right warning even when other modes also apply. Flow State is the rarest label and the rules reflect that. Recovery is the catch all because most of a race is, in fact, recovery between stress events.
 
+### Per driver priors
+
+The thresholds above describe the population level default. A real
+driver has their own operating envelope: throttle aggression, brake
+modulation, baseline heart rate, and how all three vary across a
+lap. Applying one absolute set of thresholds to every driver over
+labels aggressive drivers as Panic and conservative drivers as
+Defensive, even when both are inside their personal envelope.
+
+The cognitive engine therefore shifts the four core persona
+thresholds (`panic_stress`, `aggressive_stress`,
+`defensive_confidence`, `flow_confidence`) by a per driver offset
+loaded from `data/persona_priors.json`. The offsets are computed
+once by `scripts/compute_persona_priors.py` against a chosen FastF1
+session.
+
+For each driver `D` we extract a stress proxy per lap:
+
+```text
+throttle_stdev(lap)   = stdev of the throttle pedal trace across the lap
+brake_stdev(lap)      = stdev of the brake channel across the lap
+mean_speed(lap)       = mean speed across the lap
+```
+
+The lap level features are reduced to a per driver median (robust
+against a single crash lap polluting the average):
+
+```text
+median_throttle(D)   = median over D's laps of throttle_stdev
+median_brake(D)      = median over D's laps of brake_stdev
+```
+
+Each per driver median is z scored against the session median:
+
+```text
+z_throttle(D) = (median_throttle(D) - session_median_throttle) / session_std_throttle
+z_brake(D)    = (median_brake(D)    - session_median_brake)    / session_std_brake
+hot_z(D)      = (z_throttle(D) + z_brake(D)) / 2
+```
+
+A positive `hot_z(D)` means the driver runs hotter than the field
+median for this session, a negative one means cooler. We then
+shift the four thresholds linearly with `hot_z(D)`:
+
+```text
+panic_stress_offset         =   6.0 * hot_z(D)
+aggressive_stress_offset    =   5.0 * hot_z(D)
+defensive_confidence_offset =  -4.0 * hot_z(D)
+flow_confidence_offset      =   3.0 * hot_z(D)
+```
+
+The signs follow from the rule directions. A hotter driver needs a
+higher panic threshold before they get the Panic label and a lower
+defensive confidence threshold before they get the Defensive label.
+A cooler driver gets the opposite shift. The 6 / 5 / 4 / 3 scale
+factors were chosen so that one standard deviation of operating
+envelope corresponds to roughly five threshold points, which is the
+same order of magnitude as the persona boundaries themselves.
+
+The default priors file shipped in this repository is calibrated
+against the 2021 Abu Dhabi race because that is the playback session
+the streamer ships with, so the priors line up with the demo data
+out of the box. Regenerating against another session is one command:
+
+```bash
+python scripts/compute_persona_priors.py --year 2023 --event "Las Vegas"
+```
+
+Drivers that the priors file does not cover, and runs where the
+file is missing entirely, fall back cleanly to the population
+default thresholds defined above. The cognitive engine logs whether
+priors are active at startup and every emitted cognitive event
+carries a `priors_active: true|false` field so a judge can verify
+from the Kafka topic alone whether per driver priors are in use.
+
 ## 5. Tunnel Vision
 
 A boolean flag promoted into a probability for downstream consumers.
