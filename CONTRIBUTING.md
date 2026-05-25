@@ -4,7 +4,7 @@ Welcome. NeuroPit is a real time Cognitive Twin Operating System for motorsport.
 
 ## What we accept
 
-- Bug fixes against the existing cognitive engine, the emotional state engine, the predictive failure engine, the Ghost Lap AI, the counterfactual simulator, the strategy parliament, the explainability worker, the gateway, or the Mission Control surface.
+- Bug fixes against the existing cognitive engine, the emotional state engine, the predictive failure engine, the Ghost Lap AI, the counterfactual simulator, the strategy parliament, the explainability worker, the gateway, the live PPG biometric ingestion path, the per driver persona prior loader, or the Mission Control surface.
 - New features that map cleanly to an unimplemented layer of the architecture in `docs/ARCHITECTURE.md`.
 - New tests against existing code. We treasure tests.
 - Documentation improvements that preserve the Cognitive Twin Operating System positioning. Telemetry is infrastructure. Cognition is the product.

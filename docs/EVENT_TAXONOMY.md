@@ -106,9 +106,13 @@ Producers: `FeatureExtractor`, `FeaturePipeline`.
 Consumers: `BiometricSynthesizer`, `CognitiveInferenceEngine`, `InfluxDBWriter`.
 
 ### biometrics-enriched
-Synthetic heart rate, HRV, and respiration estimates driven from the feature stream. These are always tagged as synthetic when they reach the audit log so nobody confuses them with real wearable data.
+Heart rate, HRV, and respiration estimates per driver. Two producers can write to this topic and they are distinguished by the `source` field.
 
-Example payload:
+The default producer is the `BiometricSynthesizer`, which derives a synthetic biometric from the feature stream and tags every event with `source: "synthetic"`. The synthetic stream is encrypted at source so the audit log never holds plain biometrics.
+
+The second producer is the live PPG ingestion path. When a user opens the Mission Control `/sensor` page on a phone, the browser samples the rear camera, extracts a beats per minute number locally, and ships it over a WebSocket to the gateway. The gateway forwards the payload through `PPGForwarder` onto the same topic, tagged with `source: "ppg-camera"`. The cognitive engine joins both streams against the feature topic identically; the source tag is the only thing that lets a downstream consumer (or a judge) tell live human telemetry from synthetic telemetry.
+
+Synthetic example payload:
 
 ```json
 {
@@ -116,11 +120,29 @@ Example payload:
   "driver_id": "VER",
   "synthetic_hr": 168.4,
   "synthetic_hrv": 32.7,
-  "respiration_rate": 25.6
+  "respiration_rate": 25.6,
+  "source": "synthetic",
+  "encrypted_payload": "<Fernet ciphertext>"
 }
 ```
 
-Producers: `BiometricSynthesizer`.
+Live PPG example payload:
+
+```json
+{
+  "timestamp": "2026-05-19T12:00:00.500Z",
+  "driver_id": "VER",
+  "synthetic_hr": 74.2,
+  "synthetic_hrv": 50.0,
+  "respiration_rate": 16.0,
+  "source": "ppg-camera",
+  "ppg_confidence": 0.45
+}
+```
+
+The field is named `synthetic_hr` for both sources so the cognitive engine can stay source agnostic. The `source` tag and the optional `ppg_confidence` field are how a judge tells the two sources apart.
+
+Producers: `BiometricSynthesizer`, `PPGForwarder` (via the `/ws/sensor` WebSocket route on the gateway).
 Consumers: `CognitiveInferenceEngine`.
 
 ### cognitive-state-inference
@@ -138,9 +160,13 @@ Example payload:
   "tunnel_vision_prob": 0.0,
   "persona_state": "Aggressive",
   "confidence_band": "moderate",
+  "weights_version": "v1.1.0",
+  "priors_active": true,
   "explainability_pending": true
 }
 ```
+
+The `priors_active` flag records whether the cognitive engine applied per driver persona priors (from `data/persona_priors.json`) for this event. When the priors file is missing or the driver is not in it, the engine falls back to population level thresholds and the flag is `false`. See `docs/COGNITIVE_METHODOLOGY.md` for the prior derivation.
 
 Producers: `CognitiveInferenceEngine`.
 Consumers: Granite explanation worker, FastAPI gateway, InfluxDB writer.

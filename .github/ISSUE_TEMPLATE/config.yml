@@ -9,3 +9,6 @@ contact_links:
   - name: Event taxonomy
     url: https://github.com/vighriday/neuropit-may-2026/blob/main/docs/EVENT_TAXONOMY.md
     about: Read this before adding a new Kafka topic or changing a payload shape.
+  - name: Failure modes retrospective
+    url: https://github.com/vighriday/neuropit-may-2026/blob/main/docs/FAILURE_MODES.md
+    about: Honest log of approaches that were tried and rejected. Read before reopening a closed design decision.

@@ -14,6 +14,8 @@
 [![IBM Docling](https://img.shields.io/badge/IBM-Docling-052FAD?logo=ibm)](https://www.docling.ai)
 [![Langflow](https://img.shields.io/badge/Langflow-Orchestrated-1f7a8c)](https://www.langflow.org)
 [![Tests](https://img.shields.io/badge/tests-195%20passing-brightgreen)](tests/)
+[![Live PPG biometrics](https://img.shields.io/badge/Live%20PPG-phone%20camera-ff6a00)](src/frontend/app/sensor/page.tsx)
+[![Per-driver priors](https://img.shields.io/badge/Per--driver%20priors-FastF1%202021-1f7a8c)](data/persona_priors.json)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-3776AB?logo=python&logoColor=white)](https://www.python.org)
 [![Next.js 14](https://img.shields.io/badge/Next.js-14-000000?logo=nextdotjs)](https://nextjs.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
@@ -130,10 +132,13 @@ flowchart TD
     C --> E[InfluxDB raw telemetry]
     D --> F[Telemetry Features Topic]
     F --> G[Biometric Synthesiser<br/>Fernet encrypted at source]
-    G --> H[Biometrics Topic]
-    F --> I[Probabilistic Cognitive<br/>Inference Engine]
+    G --> H[Biometrics Topic<br/>source: synthetic or ppg-camera]
+    PHONE[Phone Camera<br/>Live PPG] -->|WebSocket /ws/sensor| PPG[PPG Ingest<br/>src/backend/integration/ppg_ingest.py]
+    PPG --> H
+    PRIORS[(Per-driver priors<br/>data/persona_priors.json)] -.-> I
+    F --> I[Probabilistic Cognitive<br/>Inference Engine<br/>+ Persona Drift]
     H --> I
-    I --> J[Cognitive State Topic]
+    I --> J[Cognitive State Topic<br/>priors_active flag]
     J --> K[Emotional State Engine]
     J --> L[Predictive Failure Engine]
     J --> M[IBM Granite Explainable<br/>Cognitive Reasoning]
@@ -141,10 +146,10 @@ flowchart TD
     O --> M
     K --> P[Emotional Events Topic]
     M --> Q[Explanation Events Topic]
-    J --> R[FastAPI Cognitive Gateway<br/>JWT + RBAC]
+    J --> R[FastAPI Cognitive Gateway<br/>JWT + RBAC<br/>WebSocket /ws/cognitive + /ws/sensor]
     P --> R
     Q --> R
-    R --> S[Mission Control<br/>Next.js + WebSocket]
+    R --> S[Mission Control<br/>Next.js + WebSocket<br/>incl. /sensor page]
     R --> T[Ghost Lap REST]
     R --> U[Counterfactual REST]
     R --> V[Parliament REST]
@@ -196,6 +201,9 @@ The default persona thresholds (Panic, Aggressive, Defensive, Flow, Recovery, Fa
 [`scripts/compute_persona_priors.py`](scripts/compute_persona_priors.py) loads a configurable FastF1 session, extracts a stress proxy per lap per driver (throttle and brake variability, normalised mean speed), takes the median across laps, and z-scores each driver against the session median. The z-scores translate into threshold offsets in [`data/persona_priors.json`](data/persona_priors.json). The cognitive engine loads these offsets at startup so each driver gets thresholds shifted by their own operating envelope. Drivers without a prior fall back cleanly to the population default. Every cognitive event carries a `priors_active: true` field so a judge can verify the priors are live from the Kafka topic alone. The 2021 Abu Dhabi race priors that ship by default cover 19 drivers; anyone with FastF1 access can regenerate the artefact for any other session by passing `--year` and `--event`.
 
 ### Live PPG biometric ingestion (phone camera)
+
+![Live PPG sensor page](docs/assets/screenshots/sensor.png)
+*The `/sensor` page rendered on the laptop for reference. The same page on a phone turns the rear camera into a heart-rate sensor and ships live BPM into the cognitive pipeline.*
 
 The biometric layer is no longer synthetic only. Opening [`/sensor`](src/frontend/app/sensor/page.tsx) on any phone with a rear camera turns that phone into a low-fidelity heart-rate sensor. The browser samples the red channel of the camera at thirty frames per second, detrends against ambient light drift, enforces a refractory period between accepted peaks, and emits a median-smoothed BPM once per second to the gateway over WebSocket. The gateway forwards each sample to the same `biometrics-enriched` Kafka topic the synthetic biometric source publishes to, tagged with `source: "ppg-camera"`. The cognitive engine consumes the topic identically regardless of the source, so the dashboard reacts to your actual heart rate as if it were a synthetic value.
 
@@ -274,6 +282,8 @@ The script prints the URLs to open. Within roughly thirty seconds you have a liv
 
 To shut everything down: `python scripts/judge_bootstrap.py --down`.
 
+If you see `401 unauthorized` against InfluxDB in the backend logs after the first run (this happens when the docker volumes were initialised by a previous build with a different admin token), wipe the volumes once with `python scripts/judge_bootstrap.py --reset` and then run the bootstrap again.
+
 **Manual path (multi-terminal).** If you prefer to run each piece by hand and watch its logs:
 
 ```bash
@@ -323,12 +333,12 @@ If any step fails, the troubleshooting checklist lives under the FAQ at the bott
 | **IBM Granite usage** | [`src/backend/reasoning/granite_client.py`](src/backend/reasoning/granite_client.py) — Granite 3.0 2B Instruct via Hugging Face by default (drop-in upgrade to Granite 3.1 8B by flipping `GRANITE_MODEL_ID`), ontology-grounded prompts, deterministic stub fallback, watsonx.ai optional path. Every reasoning event ships with its `model_source`. |
 | **IBM Docling usage** | [`src/backend/knowledge/docling_compiler.py`](src/backend/knowledge/docling_compiler.py) — compiles FIA reports, neuroscience papers, and racing literature into a Qdrant collection. Retrieved at every Granite call. |
 | **Langflow usage** | [`orchestration/langflow/neuropit_strategy_flow.json`](orchestration/langflow/neuropit_strategy_flow.json) — importable visual flow. |
-| **Innovation** | Three-tier system: diagnostic Cognitive Twin, prescriptive engine with typed action space and Optimality Gap against a per-driver Performance Envelope, audit-log-driven What-If Replay that lets the strategist re-run real session data under a mutated input. Nobody else ships this stack. |
-| **Technical depth** | Event-driven Redpanda pipeline, InfluxDB time-series persistence, Qdrant vector grounding, FastAPI WebSocket fan-out, JWT + RBAC, Fernet encryption at source, 195 unit tests, GitHub Actions CI. |
-| **Explainability** | Every output ships with a Granite paragraph, a confidence band, and a JSONL audit row. Physics-first reasoning forbids Granite from inventing cognitive numbers. |
-| **Impact** | Closes the seven-figure gap between telemetry analytics and driver state. Generalises to aviation, defence, surgery, esports, and elite athletics. |
-| **Demo readiness** | One `make` command per terminal. Mission Control pit-wall shows the Cognitive Twin emitting within ten seconds of stream start. |
-| **Open source posture** | Apache 2.0. Contributor Covenant 2.1 code of conduct. Security policy. Contributing guide. PR template enforcing methodology updates. CI on every push. |
+| **Innovation** | Three-tier system: diagnostic Cognitive Twin, prescriptive engine with typed action space and Optimality Gap against a per-driver Performance Envelope, audit-log-driven What-If Replay that lets the strategist re-run real session data under a mutated input. **Live PPG biometric ingestion** from a phone camera as a second source on the same Kafka topic the synthetic source uses. **Per-driver persona priors** calibrated against real 2021 F1 telemetry, loaded at engine startup, audit-flagged on every cognitive event. Nobody else ships this stack. |
+| **Technical depth** | Event-driven Redpanda pipeline, InfluxDB time-series persistence, Qdrant vector grounding, FastAPI WebSocket fan-out, JWT + RBAC, Fernet encryption at source, browser-side PPG signal processing (red-channel sampling, refractory peak counting, median smoothing), z-scored per-driver priors from FastF1 telemetry, 195 unit tests, GitHub Actions CI. |
+| **Explainability** | Every output ships with a Granite paragraph, a confidence band, a `priors_active` flag, and a JSONL audit row. Physics-first reasoning forbids Granite from inventing cognitive numbers. The engineering retrospective in [`docs/FAILURE_MODES.md`](docs/FAILURE_MODES.md) documents ten rejected approaches with traceable commits. |
+| **Impact** | Closes the seven-figure gap between telemetry analytics and driver state. Live PPG path proves the architecture is not synthetic-only and generalises to any wearable signal. Generalises to aviation, defence, surgery, esports, and elite athletics. |
+| **Demo readiness** | One Python command (`python scripts/judge_bootstrap.py`) brings up Docker, topics, backend, gateway, streamer, and Mission Control. Mission Control pit-wall shows the Cognitive Twin emitting within ten seconds of stream start. The `/sensor` page is one nav tap away. |
+| **Open source posture** | Apache 2.0. Contributor Covenant 2.1 code of conduct. Security policy (including the deliberate unauthenticated `/ws/sensor` posture choice). Contributing guide. PR template enforcing methodology updates. CI on every push. |
 
 ---
 
@@ -380,6 +390,8 @@ A minute-by-minute run order judges or recruiters can follow without you in the 
 | Knowledge | IBM Docling |
 | Orchestration | Langflow reference flow |
 | Telemetry source | OpenF1 + FastF1 |
+| Live biometrics | Browser camera PPG (red channel sampling, refractory peak counting, median smoothing), streamed to the gateway over WebSocket |
+| Per-driver calibration | Real F1 telemetry priors (z-scored persona threshold offsets) computed from FastF1, loaded at engine startup |
 | Tests | pytest, 195 unit tests, integration tests gated on infra |
 | CI | GitHub Actions on every push and pull request |
 
@@ -430,9 +442,10 @@ CI runs the backend unit suite, the import smoke, and the frontend type check on
 ## Roadmap
 
 - **Phase 1 (shipped, v0.3.0)** — Full nine-score Cognitive Twin, Emotional State Engine, all architectural layers, JWT gateway, Mission Control surface, OSS hygiene, GitHub Actions CI.
-- **Phase 2** — Statistical adaptation. Rolling baselines, telemetry normalisation, adaptive thresholds per driver.
+- **Phase 1.5 (shipped, current build)** — Per-driver persona priors trained on real 2021 F1 telemetry, live PPG biometric ingestion from a phone camera into the same Kafka topic the synthetic source uses, one-command judge bootstrap, engineering retrospective in `docs/FAILURE_MODES.md`.
+- **Phase 2** — Statistical adaptation. Rolling baselines beyond the per driver priors, telemetry normalisation, adaptive thresholds that learn during a session rather than load once.
 - **Phase 3** — Learned behavioural models. Lightweight temporal classifiers on the existing feature inputs without changing the cognitive twin output contract.
-- **Phase 4** — Multimodal cognitive transformer. Reinforcement learning. Personalised driver twins. Live wearable biometrics replacing the synthetic stream.
+- **Phase 4** — Multimodal cognitive transformer. Reinforcement learning. Wearable grade biometrics (chest strap, ECG patch) replacing the phone PPG path with a clinical signal.
 
 The architecture is built so each phase swaps the inference function without rewriting the surface contract.
 
@@ -453,7 +466,7 @@ Granite is a generative model. If a strategist is going to defend a pit call aga
 No. The default Granite path is local Hugging Face inference of `ibm-granite/granite-3.0-2b-instruct` (around 4 GB on disk, fits on a 16 GB workstation). To upgrade to the 8B model, set `GRANITE_MODEL_ID=ibm-granite/granite-3.1-8b-instruct` in `.env` and re-run `python scripts/download_granite.py`. Watsonx.ai is an optional cloud fallback. The deterministic templated stub is a third fallback so Mission Control never goes dark.
 
 **Where do biometrics come from?**
-The biometric synthesiser conditions heart rate, HRV, and respiration on telemetry features. They are clearly labelled `synthetic_*` everywhere they appear. Phase 4 swaps the synthesiser for a live wearable stream without changing the cognitive engine.
+Two sources, distinguishable by the `source` field on the `biometrics-enriched` Kafka topic. The default source is the biometric synthesiser, which conditions heart rate, HRV, and respiration on telemetry features and tags every event with `source: "synthetic"`. The synthetic stream is Fernet encrypted at write. The second source is the live PPG ingestion path: opening `/sensor` on a phone turns the rear camera into a low fidelity heart rate sensor and ships live BPM into the same topic tagged with `source: "ppg-camera"`. The cognitive engine joins both sources against the feature topic identically; the source tag is the only thing that distinguishes them. Phase 4 of the roadmap swaps the phone PPG for a clinical wearable signal.
 
 **What happens if Redpanda, InfluxDB, or Qdrant is offline?**
 Every consumer gracefully degrades to "no grounding available" or "skipped" rather than crashing. The cognitive engine still emits the deterministic twin. The audit log still writes. Mission Control still updates over the heartbeat channel.
@@ -473,6 +486,7 @@ Every consumer gracefully degrades to "no grounding available" or "skipped" rath
 - [Event taxonomy](docs/EVENT_TAXONOMY.md) — every Kafka topic, its payload shape, producers, consumers.
 - [Demo script](docs/DEMO.md) — minute-by-minute walkthrough of the live pit wall.
 - [Failure modes](docs/FAILURE_MODES.md) — honest retrospective of approaches that were tried and either abandoned or rebuilt during the project.
+- [Data directory](data/README.md) — per-driver persona priors artifact, knowledge sources for the Docling compiler.
 - [Contributing](CONTRIBUTING.md)
 - [Security policy](SECURITY.md)
 - [Code of conduct](CODE_OF_CONDUCT.md)
