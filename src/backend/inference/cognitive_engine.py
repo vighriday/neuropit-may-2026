@@ -25,7 +25,7 @@ from confluent_kafka import Consumer, Producer
 from influxdb_client import InfluxDBClient, Point, WritePrecision
 from influxdb_client.client.write_api import SYNCHRONOUS
 
-from src.backend.common import audit, persona, uncertainty, weights
+from src.backend.common import audit, persona, priors, uncertainty, weights
 from src.backend.config import get_settings
 
 logger = logging.getLogger(__name__)
@@ -57,6 +57,13 @@ class CognitiveInferenceEngine:
 
         self.state_cache: dict = {}
         self.weights_snapshot = weights.snapshot()
+        self.priors_metadata = priors.load_priors()
+        if self.priors_metadata.available:
+            logger.info(
+                "Cognitive engine using per driver persona priors for %d drivers (source=%s)",
+                self.priors_metadata.driver_count,
+                self.priors_metadata.source,
+            )
 
         self.influx_client = InfluxDBClient(
             url=settings.influxdb_url,
@@ -188,6 +195,7 @@ class CognitiveInferenceEngine:
             fatigue=fatigue_score,
             panic_oscillation=panic_oscillation,
             throttle_commitment=throttle_commitment,
+            driver_id=driver_id,
         )
 
         trust = uncertainty.evaluate(
@@ -223,6 +231,7 @@ class CognitiveInferenceEngine:
             "confidence_band": trust.band,
             "trust": trust.to_dict(),
             "weights_version": self.weights_snapshot["version"],
+            "priors_active": self.priors_metadata.available,
             "explainability_pending": True,
             "context": {
                 "line_consistency": line_consistency,

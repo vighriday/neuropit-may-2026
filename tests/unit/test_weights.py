@@ -35,7 +35,9 @@ def test_snapshot_contains_every_section():
         "failure_forecast",
         "prescription",
         "persona",
+        "priors",
     }
+    assert "available" in snap["priors"]
 
 
 def test_failure_forecast_weights_sum_to_one_per_probability():

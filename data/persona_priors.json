@@ -1,0 +1,239 @@
+{
+  "documentation": "Population defaults (PersonaThresholds in src/backend/common/weights.py): panic_stress=85, aggressive_stress=70, defensive_confidence=50, flow_confidence=80.",
+  "drivers": {
+    "ALO": {
+      "aggressive_stress_offset": -1.4,
+      "defensive_confidence_offset": 1.12,
+      "flow_confidence_offset": -0.84,
+      "hot_envelope_z": -0.28,
+      "panic_stress_offset": -1.68,
+      "proxy_medians": {
+        "brake_stdev": 0.364,
+        "mean_speed": 208.601,
+        "throttle_stdev": 41.219
+      }
+    },
+    "BOT": {
+      "aggressive_stress_offset": 2.63,
+      "defensive_confidence_offset": -2.11,
+      "flow_confidence_offset": 1.58,
+      "hot_envelope_z": 0.526,
+      "panic_stress_offset": 3.16,
+      "proxy_medians": {
+        "brake_stdev": 0.379,
+        "mean_speed": 209.02,
+        "throttle_stdev": 41.485
+      }
+    },
+    "GAS": {
+      "aggressive_stress_offset": -0.86,
+      "defensive_confidence_offset": 0.69,
+      "flow_confidence_offset": -0.51,
+      "hot_envelope_z": -0.172,
+      "panic_stress_offset": -1.03,
+      "proxy_medians": {
+        "brake_stdev": 0.364,
+        "mean_speed": 208.309,
+        "throttle_stdev": 41.415
+      }
+    },
+    "GIO": {
+      "aggressive_stress_offset": -1.15,
+      "defensive_confidence_offset": 0.92,
+      "flow_confidence_offset": -0.69,
+      "hot_envelope_z": -0.231,
+      "panic_stress_offset": -1.38,
+      "proxy_medians": {
+        "brake_stdev": 0.373,
+        "mean_speed": 207.125,
+        "throttle_stdev": 40.557
+      }
+    },
+    "HAM": {
+      "aggressive_stress_offset": -6.35,
+      "defensive_confidence_offset": 5.08,
+      "flow_confidence_offset": -3.81,
+      "hot_envelope_z": -1.269,
+      "panic_stress_offset": -7.62,
+      "proxy_medians": {
+        "brake_stdev": 0.37,
+        "mean_speed": 213.207,
+        "throttle_stdev": 38.859
+      }
+    },
+    "LAT": {
+      "aggressive_stress_offset": 4.83,
+      "defensive_confidence_offset": -3.86,
+      "flow_confidence_offset": 2.9,
+      "hot_envelope_z": 0.966,
+      "panic_stress_offset": 5.79,
+      "proxy_medians": {
+        "brake_stdev": 0.389,
+        "mean_speed": 206.282,
+        "throttle_stdev": 41.525
+      }
+    },
+    "LEC": {
+      "aggressive_stress_offset": -2.94,
+      "defensive_confidence_offset": 2.35,
+      "flow_confidence_offset": -1.76,
+      "hot_envelope_z": -0.588,
+      "panic_stress_offset": -3.53,
+      "proxy_medians": {
+        "brake_stdev": 0.386,
+        "mean_speed": 209.57,
+        "throttle_stdev": 38.921
+      }
+    },
+    "MSC": {
+      "aggressive_stress_offset": 5.77,
+      "defensive_confidence_offset": -4.62,
+      "flow_confidence_offset": 3.46,
+      "hot_envelope_z": 1.154,
+      "panic_stress_offset": 6.92,
+      "proxy_medians": {
+        "brake_stdev": 0.387,
+        "mean_speed": 207.171,
+        "throttle_stdev": 42.046
+      }
+    },
+    "NOR": {
+      "aggressive_stress_offset": 2.97,
+      "defensive_confidence_offset": -2.37,
+      "flow_confidence_offset": 1.78,
+      "hot_envelope_z": 0.594,
+      "panic_stress_offset": 3.56,
+      "proxy_medians": {
+        "brake_stdev": 0.38,
+        "mean_speed": 208.395,
+        "throttle_stdev": 41.532
+      }
+    },
+    "OCO": {
+      "aggressive_stress_offset": -2.21,
+      "defensive_confidence_offset": 1.77,
+      "flow_confidence_offset": -1.33,
+      "hot_envelope_z": -0.443,
+      "panic_stress_offset": -2.66,
+      "proxy_medians": {
+        "brake_stdev": 0.37,
+        "mean_speed": 208.886,
+        "throttle_stdev": 40.439
+      }
+    },
+    "PER": {
+      "aggressive_stress_offset": 3.07,
+      "defensive_confidence_offset": -2.46,
+      "flow_confidence_offset": 1.84,
+      "hot_envelope_z": 0.614,
+      "panic_stress_offset": 3.68,
+      "proxy_medians": {
+        "brake_stdev": 0.373,
+        "mean_speed": 212.078,
+        "throttle_stdev": 42.175
+      }
+    },
+    "RAI": {
+      "aggressive_stress_offset": 3.89,
+      "defensive_confidence_offset": -3.11,
+      "flow_confidence_offset": 2.34,
+      "hot_envelope_z": 0.778,
+      "panic_stress_offset": 4.67,
+      "proxy_medians": {
+        "brake_stdev": 0.389,
+        "mean_speed": 205.848,
+        "throttle_stdev": 41.238
+      }
+    },
+    "RIC": {
+      "aggressive_stress_offset": -4.63,
+      "defensive_confidence_offset": 3.7,
+      "flow_confidence_offset": -2.78,
+      "hot_envelope_z": -0.926,
+      "panic_stress_offset": -5.55,
+      "proxy_medians": {
+        "brake_stdev": 0.348,
+        "mean_speed": 208.364,
+        "throttle_stdev": 41.236
+      }
+    },
+    "RUS": {
+      "aggressive_stress_offset": 5.4,
+      "defensive_confidence_offset": -4.32,
+      "flow_confidence_offset": 3.24,
+      "hot_envelope_z": 1.079,
+      "panic_stress_offset": 6.47,
+      "proxy_medians": {
+        "brake_stdev": 0.392,
+        "mean_speed": 204.601,
+        "throttle_stdev": 41.558
+      }
+    },
+    "SAI": {
+      "aggressive_stress_offset": -6.46,
+      "defensive_confidence_offset": 5.17,
+      "flow_confidence_offset": -3.88,
+      "hot_envelope_z": -1.292,
+      "panic_stress_offset": -7.75,
+      "proxy_medians": {
+        "brake_stdev": 0.36,
+        "mean_speed": 209.879,
+        "throttle_stdev": 39.644
+      }
+    },
+    "STR": {
+      "aggressive_stress_offset": 1.05,
+      "defensive_confidence_offset": -0.84,
+      "flow_confidence_offset": 0.63,
+      "hot_envelope_z": 0.21,
+      "panic_stress_offset": 1.26,
+      "proxy_medians": {
+        "brake_stdev": 0.38,
+        "mean_speed": 207.298,
+        "throttle_stdev": 40.88
+      }
+    },
+    "TSU": {
+      "aggressive_stress_offset": -3.99,
+      "defensive_confidence_offset": 3.19,
+      "flow_confidence_offset": -2.4,
+      "hot_envelope_z": -0.798,
+      "panic_stress_offset": -4.79,
+      "proxy_medians": {
+        "brake_stdev": 0.358,
+        "mean_speed": 209.06,
+        "throttle_stdev": 40.673
+      }
+    },
+    "VER": {
+      "aggressive_stress_offset": 0.59,
+      "defensive_confidence_offset": -0.47,
+      "flow_confidence_offset": 0.35,
+      "hot_envelope_z": 0.118,
+      "panic_stress_offset": 0.71,
+      "proxy_medians": {
+        "brake_stdev": 0.365,
+        "mean_speed": 212.157,
+        "throttle_stdev": 41.826
+      }
+    },
+    "VET": {
+      "aggressive_stress_offset": -0.2,
+      "defensive_confidence_offset": 0.16,
+      "flow_confidence_offset": -0.12,
+      "hot_envelope_z": -0.04,
+      "panic_stress_offset": -0.24,
+      "proxy_medians": {
+        "brake_stdev": 0.382,
+        "mean_speed": 207.199,
+        "throttle_stdev": 40.208
+      }
+    }
+  },
+  "schema_version": 1,
+  "source": {
+    "event": "Abu Dhabi",
+    "session": "R",
+    "year": 2021
+  }
+}

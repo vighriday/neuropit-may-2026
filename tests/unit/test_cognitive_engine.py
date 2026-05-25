@@ -12,8 +12,13 @@ from src.backend.inference.cognitive_engine import CognitiveInferenceEngine
 
 def _engine() -> CognitiveInferenceEngine:
     engine = CognitiveInferenceEngine.__new__(CognitiveInferenceEngine)
+    from src.backend.common import priors as priors_module
     from src.backend.common import weights as weights_module
 
+    # Force a clean priors load before snapshot so the test stays
+    # deterministic regardless of whether priors are checked in.
+    priors_module.reset_for_tests()
+    engine.priors_metadata = priors_module.load_priors()
     engine.weights_snapshot = weights_module.snapshot()
     engine.producer = type("P", (), {"produce": lambda *a, **k: None, "poll": lambda *a, **k: None})()
     engine.influx_bucket = "test"

@@ -255,7 +255,15 @@ PERSONA = PersonaThresholds()
 
 
 def snapshot() -> dict:
-    """Return a serialisable record of the active weights for the audit log."""
+    """Return a serialisable record of the active weights for the audit log.
+
+    The priors metadata is loaded lazily to avoid a circular import at
+    module load time. If priors are not loaded yet the dict still
+    includes an `available: False` entry so downstream consumers do not
+    need a defensive `.get()` everywhere.
+    """
+    from src.backend.common import priors  # local import: avoids cycle
+
     return {
         "version": VERSION,
         "stress": asdict(STRESS),
@@ -269,4 +277,5 @@ def snapshot() -> dict:
         "failure_forecast": asdict(FAILURE),
         "prescription": asdict(PRESCRIPTION),
         "persona": asdict(PERSONA),
+        "priors": priors.priors_metadata(),
     }
