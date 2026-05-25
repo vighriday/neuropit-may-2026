@@ -32,6 +32,8 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { Nav } from "../../components/Nav";
+
 type CaptureState =
   | "idle"
   | "requesting"
@@ -397,6 +399,7 @@ export default function SensorPage() {
 
   return (
     <main className="min-h-screen bg-neutral-950 text-neutral-100 p-6 flex flex-col gap-6">
+      <Nav />
       <header className="flex flex-col gap-1">
         <h1 className="text-2xl font-bold">NeuroPit live biometric sensor</h1>
         <p className="text-sm text-neutral-400">

@@ -9,6 +9,7 @@ const TABS = [
   { href: "/ghost-lap", label: "Ghost Lap" },
   { href: "/counterfactual", label: "Counterfactual" },
   { href: "/explainability", label: "Explainability" },
+  { href: "/sensor", label: "Live PPG", accent: true as const },
 ];
 
 export function Nav() {
@@ -29,16 +30,19 @@ export function Nav() {
       <div className="flex gap-2 flex-wrap">
         {TABS.map((tab) => {
           const active = pathname === tab.href;
+          const accent = "accent" in tab && tab.accent;
+          let className = "px-3 py-1 rounded border transition-colors ";
+          if (active) {
+            className += "border-red-700/60 bg-red-900/20 text-red-300";
+          } else if (accent) {
+            className +=
+              "border-amber-500/70 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20";
+          } else {
+            className +=
+              "border-gray-800 text-gray-400 hover:text-gray-200 hover:border-gray-600";
+          }
           return (
-            <Link
-              key={tab.href}
-              href={tab.href}
-              className={`px-3 py-1 rounded border transition-colors ${
-                active
-                  ? "border-red-700/60 bg-red-900/20 text-red-300"
-                  : "border-gray-800 text-gray-400 hover:text-gray-200 hover:border-gray-600"
-              }`}
-            >
+            <Link key={tab.href} href={tab.href} className={className}>
               {tab.label}
             </Link>
           );
